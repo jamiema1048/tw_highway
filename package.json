@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "start:json-server": "json-server --watch db.json --port 8000"
+    "start:json-server": "json-server --watch db.json --port 8000",
+    "test": "vitest",
+    "test:watch": "vitest --watch"
   },
   "dependencies": {
     "next": "15.1.6",
@@ -16,11 +18,15 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
     "@types/node": "22.10.10",
     "@types/react": "19.0.8",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
+    "jsdom": "^26.0.0",
     "postcss": "^8",
-    "tailwindcss": "^3.4.1"
+    "tailwindcss": "^3.4.1",
+    "vitest": "^3.0.4"
   }
 }
