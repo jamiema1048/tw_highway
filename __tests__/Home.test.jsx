@@ -1,32 +1,25 @@
 import React from "react";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import Home from "@/app/page";
 
 // 測試 Home 組件
-describe("<Home />", () => {
-  it("should have Docs text", () => {
-    render(<Home />); // ARRANGE
+describe("Home", () => {
+  it("renders the Home component", () => {
+    render(<Home />);
 
-    const myElem = screen.getByText("Docs"); // ACT
-
-    expect(myElem).toBeInTheDocument(); // ASSERT
+    screen.debug(); // prints out the jsx in the Home component unto the command line
   });
+});
+describe("Mock example", () => {
+  it("calls the mock function", () => {
+    const mockFn = vi.fn(() => "Hello"); // 創建一個模擬函數，回傳 'Hello'
 
-  it('should contain the text "information"', () => {
-    render(<Home />); // ARRANGE
+    // 調用 mock 函數
+    expect(mockFn()).toBe("Hello"); // 測試回傳值是否為 'Hello'
+    expect(mockFn()).not.equal("Go away");
 
-    const myElem = screen.getByText(/information/i); // ACT
-
-    expect(myElem).toBeInTheDocument(); // ASSERT
-  });
-
-  it("should have a heading", () => {
-    render(<Home />); // ARRANGE
-
-    const myElem = screen.getByRole("heading", {
-      name: "Learn",
-    }); // ACT
-
-    expect(myElem).toBeInTheDocument(); // ASSERT
+    // 驗證 mock 函數是否被呼叫過
+    expect(mockFn).toHaveBeenCalled();
   });
 });
