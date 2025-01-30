@@ -26,35 +26,55 @@ const HighwayList = () => {
 
   return (
     <>
-      <Link href="/">Home</Link>
-      <h1>Highway List</h1>
+      <div className="container mx-auto px-4 py-6">
+        <Link href="/" className="text-lg text-blue-500 hover:underline">
+          Home
+        </Link>
+        <h1 className="text-4xl font-bold text-white-800 text-center my-8">
+          Highway List
+        </h1>
 
-      {/* 第二區域 */}
-      <div>
-        <h2>省道</h2>
-        {section2.length > 0 ? (
-          section2.map((highway) => (
-            <h3 key={highway.id}>
-              <Link href={`highways/${highway.id}`}>{highway.name}</Link>
-            </h3>
-          ))
-        ) : (
-          <p>No highways found in this range.</p>
-        )}
-      </div>
+        {/* 第二區域: 省道 */}
+        <div className="mt-8">
+          <h2 className="text-2xl font-semibold text-white-700 mb-4">省道</h2>
+          {section2.length > 0 ? (
+            <div className="space-y-4">
+              {section2.map((highway) => (
+                <h3 key={highway.id} className="text-xl">
+                  <Link
+                    href={`highways/${highway.id}`}
+                    className="text-white-600 hover:text-yellow-400"
+                  >
+                    {highway.name}
+                  </Link>
+                </h3>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500">No highways found in this range.</p>
+          )}
+        </div>
 
-      {/* 第一區域 */}
-      <div>
-        <h2>縣市道</h2>
-        {section1.length > 0 ? (
-          section1.map((highway) => (
-            <h3 key={highway.id}>
-              <Link href={`highways/${highway.id}`}>{highway.name}</Link>
-            </h3>
-          ))
-        ) : (
-          <p>No highways found in this range.</p>
-        )}
+        {/* 第一區域: 縣市道 */}
+        <div className="mt-8">
+          <h2 className="text-2xl font-semibold text-white-700 mb-4">縣市道</h2>
+          {section1.length > 0 ? (
+            <div className="space-y-4">
+              {section1.map((highway) => (
+                <h3 key={highway.id} className="text-xl">
+                  <Link
+                    href={`highways/${highway.id}`}
+                    className="text-white-600 hover:text-yellow-400"
+                  >
+                    {highway.name}
+                  </Link>
+                </h3>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500">No highways found in this range.</p>
+          )}
+        </div>
       </div>
     </>
   );
