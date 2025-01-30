@@ -34,10 +34,14 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Database Design
+1. db.json put in the database dir
+2. other json put in public dir
 ## To-Do
 1. Fix Home.test.js file
-2. Add photo & content into page and database
+2. Add photo & description into page and database
 3. Design UI
+4. Complete all highway
 ## Require
 npm install -g json-server  
 npm install eslint@latest postcss@latest tailwindcss@latest  
