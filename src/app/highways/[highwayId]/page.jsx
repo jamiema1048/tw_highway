@@ -96,6 +96,9 @@ const HighwayContent = ({ params }) => {
           <section className="route-info bg-black-100 p-6 rounded-lg mt-8">
             <h2 className="text-2xl font-semibold mb-4">路線資料</h2>
             <p>
+              <strong>路線名稱:</strong> {data.routeName}
+            </p>
+            <p>
               <strong>起點:</strong> {data.start}
             </p>
             {data.currentStart && (
@@ -132,6 +135,11 @@ const HighwayContent = ({ params }) => {
             {data.otherName && (
               <p>
                 <strong>別稱:</strong> {data.otherName}
+              </p>
+            )}
+            {data.remark && (
+              <p>
+                <strong>備註:</strong> {data.remark}
               </p>
             )}
           </section>

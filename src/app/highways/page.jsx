@@ -45,7 +45,9 @@ const HighwayList = () => {
                     href={`highways/${highway.id}`}
                     className="text-white-600 hover:text-yellow-400"
                   >
-                    {highway.name}
+                    {highway.remark && highway.remark.includes("解編")
+                      ? `${highway.name}  (已解編)`
+                      : highway.name}
                   </Link>
                 </h3>
               ))}
@@ -66,7 +68,9 @@ const HighwayList = () => {
                     href={`highways/${highway.id}`}
                     className="text-white-600 hover:text-yellow-400"
                   >
-                    {highway.name}
+                    {highway.remark && highway.remark.includes("解編")
+                      ? `${highway.name}  (已解編)`
+                      : highway.name}
                   </Link>
                 </h3>
               ))}
