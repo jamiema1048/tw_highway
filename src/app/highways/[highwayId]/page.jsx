@@ -95,9 +95,11 @@ const HighwayContent = ({ params }) => {
 
           <section className="route-info bg-black-100 p-6 rounded-lg mt-8">
             <h2 className="text-2xl font-semibold mb-4">路線資料</h2>
-            <p>
-              <strong>路線名稱:</strong> {data.routeName}
-            </p>
+            {data.routeName && (
+              <p>
+                <strong>路線名稱:</strong> {data.routeName}
+              </p>
+            )}
             <p>
               <strong>起點:</strong> {data.start}
             </p>
