@@ -47,6 +47,8 @@ const HighwayList = () => {
                   >
                     {highway.remark && highway.remark.includes("解編")
                       ? `${highway.name}  (已解編)`
+                      : highway.remark && highway.remark.includes("未納編")
+                      ? `${highway.name}  (未納編)`
                       : highway.name}
                   </Link>
                 </h3>
@@ -70,6 +72,8 @@ const HighwayList = () => {
                   >
                     {highway.remark && highway.remark.includes("解編")
                       ? `${highway.name}  (已解編)`
+                      : highway.remark && highway.remark.includes("未納編")
+                      ? `${highway.name}  (未納編)`
                       : highway.name}
                   </Link>
                 </h3>
