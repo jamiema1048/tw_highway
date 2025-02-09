@@ -37,7 +37,8 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ## To-Do
 1. Fix Home.test.js file
 2. Add photo & content into page and database
-3. Design UI
+3. Design UI(Fix the photo display first)
+4. Set webpage title to highways.name
 ## Require
 npm install -g json-server  
 npm install eslint@latest postcss@latest tailwindcss@latest  
