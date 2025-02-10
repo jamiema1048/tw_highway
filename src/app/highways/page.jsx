@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import Head from "next/head";
+import { use, useState, useEffect } from "react";
 
 const HighwayList = () => {
   const [highways, setHighways] = useState([]);
@@ -26,6 +27,9 @@ const HighwayList = () => {
 
   return (
     <>
+      <Head>
+        <title>公路列表</title>
+      </Head>
       <div className="container mx-auto px-4 py-6">
         <Link href="/" className="text-lg text-blue-500 hover:underline">
           Home

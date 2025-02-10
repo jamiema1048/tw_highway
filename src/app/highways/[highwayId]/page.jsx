@@ -28,54 +28,48 @@ const HighwayContent = ({ params }) => {
   }, [params]); // 當 params 改變時觸發
 
   useEffect(() => {
-    if (highwayId) {
-      const fetchAllHighways = async () => {
-        try {
-          const response = await fetch("http://localhost:8000/highways"); // 獲取 highways 資料
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          const allHighways = await response.json();
+    if (!highwayId) return;
 
-          const highway = allHighways.find(
-            (hwy) => hwy.id === Number(highwayId)
-          );
+    const fetchHighwayData = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/highways");
+        if (!response.ok) throw new Error("Failed to fetch highways data");
 
-          if (!highway) {
-            setData(null);
-            setError(`Highway with ID ${highwayId} does not exist`);
-            return;
-          }
+        const allHighways = await response.json();
+        const highway = allHighways.find(
+          (hwy) => Number(hwy.id) === Number(highwayId)
+        );
 
-          // 讀取 db_images.json
-          const imagesResponse = await fetch("/db_image.json");
-          if (!imagesResponse.ok)
-            throw new Error("Failed to fetch images data");
-
-          const imagesData = await imagesResponse.json();
-          highway.images = imagesData[highwayId] || []; // 取得對應的圖片陣列
-          console.log("Highway data:", highway); // 🔍 檢查 highway 物件
-          console.log("Fetched images:", highway.images); // 🔍 檢查 images 陣列
-
-          // 讀取 db_description.json
-          const descriptionsResponse = await fetch("/db_description.json");
-          if (!descriptionsResponse.ok)
-            throw new Error("Failed to fetch descriptions data");
-
-          const descriptionsData = await descriptionsResponse.json();
-          highway.descriptions = descriptionsData[highwayId] || []; // 取得對應的內文陣列
-          console.log("Highway data:", highway); // 🔍 檢查 highway 物件
-          console.log("Fetched descriptions:", highway.descriptions); // 🔍 檢查 descriptions 陣列
-
-          setData(highway); // ✅ 確保 highway 物件有圖片後再更新 state
-          setTitle(`Highway ${highway.name}`);
-        } catch (error) {
-          setError(error.message);
+        if (!highway) {
+          setError(`Highway with ID ${highwayId} does not exist`);
+          return;
         }
-      };
 
-      fetchAllHighways();
-    }
+        // Fetch images & descriptions
+        const [imagesRes, descRes] = await Promise.all([
+          fetch("/db_image.json"),
+          fetch("/db_description.json"),
+        ]);
+
+        if (!imagesRes.ok || !descRes.ok)
+          throw new Error("Failed to fetch additional data");
+
+        const [imagesData, descriptionsData] = await Promise.all([
+          imagesRes.json(),
+          descRes.json(),
+        ]);
+
+        highway.images = imagesData[highwayId] || [];
+        highway.descriptions = descriptionsData[highwayId] || [];
+
+        setData(highway);
+        setTitle(`Highway ${highway.name}`);
+      } catch (error) {
+        setError(error.message);
+      }
+    };
+
+    fetchHighwayData();
   }, [highwayId]);
 
   if (error) {
