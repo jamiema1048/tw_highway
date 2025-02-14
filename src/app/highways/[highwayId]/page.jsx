@@ -1,13 +1,14 @@
 "use client"; // 確保這個組件在客戶端運行
 
-import { useState, useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
+import { TitleContext } from "@/app/context/TitleContext";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 
 const HighwayContent = ({ params }) => {
   const [highwayId, setHighwayId] = useState(null);
-  const [title, setTitle] = useState("");
+  const { title, setTitle } = useContext(TitleContext);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
@@ -63,7 +64,8 @@ const HighwayContent = ({ params }) => {
         highway.descriptions = descriptionsData[highwayId] || [];
 
         setData(highway);
-        setTitle(`Highway ${highway.name}`);
+        setTitle(`Highway ${highway.name}`); // 確保這行執行
+        document.title = `${highway.name}`; // 手動更新標題
       } catch (error) {
         setError(error.message);
       }

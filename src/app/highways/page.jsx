@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import Head from "next/head";
-import { use, useState, useEffect } from "react";
+import { TitleContext } from "@/app/context/TitleContext";
+import { use, useState, useEffect, useContext } from "react";
 
 const HighwayList = () => {
   const [highways, setHighways] = useState([]);
+  const { title, setTitle } = useContext(TitleContext);
 
   useEffect(() => {
     const fetchHighways = async () => {
@@ -28,7 +30,7 @@ const HighwayList = () => {
   return (
     <>
       <Head>
-        <title>公路列表</title>
+        <title>{title}</title>
       </Head>
       <div className="container mx-auto px-4 py-6">
         <Link href="/" className="text-lg text-blue-500 hover:underline">
