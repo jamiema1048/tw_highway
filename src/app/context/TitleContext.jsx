@@ -5,15 +5,23 @@ import { usePathname } from "next/navigation";
 export const TitleContext = createContext();
 
 export const TitleProvider = ({ children }) => {
-  const [title, setTitle] = useState("首頁");
   const pathname = usePathname(); // 取得當前路徑
+  const [title, setTitle] = useState(() => {
+    if (pathname == "/") {
+      return "首頁";
+    } else if (pathname == "/highways") {
+      return "公路列表";
+    }
+  });
 
   useEffect(() => {
-    if (pathname === "/") {
-      setTitle("首頁"); // 根目錄時顯示固定標題
-    } else if (pathname === "/highways") {
-      setTitle("公路列表"); // 根目錄時顯示固定標題
+    console.log("Current Path:", pathname); // 確保 pathname 正常更新
+    let newTitle = "首頁";
+    if (pathname === "/highways") {
+      newTitle = "公路列表";
     }
+    setTitle(newTitle);
+    document.title = newTitle; // 立即更新標題
   }, [pathname]);
 
   return (

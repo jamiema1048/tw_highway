@@ -2,7 +2,7 @@
 import React from "react";
 import Image from "next/image";
 import { useContext } from "react";
-import { TitleContext } from "@/app/context/TitleContext";
+import { TitleContext } from "./context/TitleContext";
 import Head from "next/head";
 
 export default function Home() {

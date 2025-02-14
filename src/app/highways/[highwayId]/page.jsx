@@ -1,7 +1,7 @@
 "use client"; // 確保這個組件在客戶端運行
 
 import { useContext, useState, useEffect } from "react";
-import { TitleContext } from "@/app/context/TitleContext";
+import { TitleContext } from "./../../context/TitleContext";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
@@ -143,35 +143,40 @@ const HighwayContent = ({ params }) => {
           </section>
 
           <section className="media-gallery mt-12">
-            <h2 className="text-2xl font-semibold mb-4">
+            <h2 className="text-2xl font-semibold mb-4 auto-rows-auto">
               Images and Descriptions
             </h2>
             {data.images && data.descriptions && (
-              <div className="grid md:grid-cols-2 gap-8">
+              <div className="columns-1 sm:columns-2 md:columns-3 gap-4 m-2">
                 {data.images.map((image, index) => (
-                  <div key={index} className="media-item">
+                  <div key={index} className="media-item inline-block p-4">
                     <div className="image-container overflow-hidden rounded-lg">
                       <Image
                         src={image}
                         alt={`Highway ${data.name} - ${index}`}
                         width={800}
                         height={600}
-                        layout="responsive"
-                        className="rounded-lg"
+                        layout="intrinsic" // 保持圖片比例
+                        className="w-full object-cover rounded-lg" // 設置固定高度，使每張圖片高度一致
                       />
                     </div>
                     {data.descriptions[index] && (
-                      <p className="mt-4 text-lg">{data.descriptions[index]}</p>
+                      <p className="mt-2 text-sm sm:text-lg">
+                        {data.descriptions[index]}
+                      </p>
                     )}
                   </div>
                 ))}
 
-                {/* Display additional descriptions if there are more descriptions than images */}
+                {/* 若描述數量多於圖片數量，顯示剩餘描述 */}
                 {data.descriptions.length > data.images.length &&
                   data.descriptions
                     .slice(data.images.length)
                     .map((desc, index) => (
-                      <p key={`desc-${index}`} className="mt-4 text-lg">
+                      <p
+                        key={`desc-${index}`}
+                        className="mt-2 sm:mt-4 text-sm sm:text-lg"
+                      >
                         {desc}
                       </p>
                     ))}

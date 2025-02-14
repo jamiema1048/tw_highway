@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Head from "next/head";
-import { TitleContext } from "@/app/context/TitleContext";
+import { TitleContext } from "./../context/TitleContext";
 import { use, useState, useEffect, useContext } from "react";
 
 const HighwayList = () => {
