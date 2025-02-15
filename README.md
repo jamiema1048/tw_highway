@@ -35,10 +35,8 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 ## To-Do
-1. Fix Home.test.js file
-2. Fix the problem : "Module not found: Can't resolve '@/app/context/TitleContext'"  
-3. Design UI(Fix the photo display first)
-4. Set webpage title to highways.name
+1. Fix Home.test.js file    
+2. Design UI  
 ## Require
 npm install -g json-server  
 npm install eslint@latest postcss@latest tailwindcss@latest  
