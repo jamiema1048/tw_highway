@@ -7,12 +7,23 @@ import Head from "next/head";
 
 export default function Home() {
   const { title } = useContext(TitleContext);
+  const handleToListClick = () => {
+    window.location.href = "/highways";
+  };
+  const handleToTheMostClick = () => {
+    window.location.href = "/themost";
+  };
+  const handleToReferenceClick = () => {
+    window.location.href = "/reference";
+  };
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <Head>
         <title>{title}</title>
       </Head>
-      <h1>這是 {title}</h1>
+      <h1 className="text-5xl font-semibold text-white-800 text-center">
+        歡迎來到小雨的公路資料網站
+      </h1>
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
         <Image
           className="dark:invert"
@@ -34,29 +45,26 @@ export default function Home() {
         </ol>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          <div className="container mx-auto mt-4 flex flex-row place-content-center">
+            <button
+              onClick={handleToListClick}
+              className="text-lg m-4 bg-green-500 text-white hover:text-yellow-300 p-4 rounded hover:bg-green-600 flex flex-row"
+            >
+              <span>公路列表</span>
+            </button>
+            <button
+              onClick={handleToTheMostClick}
+              className="text-lg m-4 bg-green-500 text-white hover:text-yellow-300 p-4 rounded hover:bg-green-600 flex flex-row"
+            >
+              <span>公路之最</span>
+            </button>
+            <button
+              onClick={handleToReferenceClick}
+              className="text-lg m-4 bg-green-500 text-white hover:text-yellow-300 p-4 rounded hover:bg-green-600 flex flex-row"
+            >
+              <span>參考資料</span>
+            </button>
+          </div>
         </div>
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">

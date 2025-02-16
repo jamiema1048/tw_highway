@@ -38,6 +38,9 @@ const HighwayList = () => {
   const handleToHomeClick = () => {
     window.location.href = "/";
   };
+  const handleToTheMostClick = () => {
+    window.location.href = "/themost";
+  };
 
   // 分區資料
   const section1 = highways.filter(
@@ -67,7 +70,7 @@ const HighwayList = () => {
           <h3 key={highway.id} className="text-xl">
             <Link
               href={`highways/${highway.id}`}
-              className="text-white-600 hover:text-yellow-400"
+              className="font-bold text-white-600 hover:text-yellow-400"
             >
               {highway.remark && highway.remark.includes("解編")
                 ? `${highway.name}  (已解編)`
@@ -92,12 +95,20 @@ const HighwayList = () => {
         <h1 className="text-4xl font-bold text-white-800 text-center my-8">
           公路列表
         </h1>
-        <button
-          onClick={handleToHomeClick}
-          className="text-lg m-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex flex-row"
-        >
-          <span>首頁</span>
-        </button>
+        <div className="container mx-auto mt-4 flex flex-row place-content-center">
+          <button
+            onClick={handleToHomeClick}
+            className="text-lg m-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 hover:text-yellow-300 flex flex-row"
+          >
+            <span>首頁</span>
+          </button>
+          <button
+            onClick={handleToTheMostClick}
+            className="text-lg m-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 hover:text-yellow-300 flex flex-row"
+          >
+            <span>公路之最</span>
+          </button>
+        </div>
 
         <div className="pl-5">
           {/* 第二區域: 省道 */}
@@ -125,6 +136,20 @@ const HighwayList = () => {
               <p className="text-gray-500">No highways found in this range.</p>
             )}
           </div>
+        </div>
+        <div className="container mx-auto mt-4 flex flex-row place-content-center">
+          <button
+            onClick={handleToHomeClick}
+            className="text-lg m-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 hover:text-yellow-300 flex flex-row"
+          >
+            <span>首頁</span>
+          </button>
+          <button
+            onClick={handleToTheMostClick}
+            className="text-lg m-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 hover:text-yellow-300 flex flex-row"
+          >
+            <span>公路之最</span>
+          </button>
         </div>
       </div>
     </>

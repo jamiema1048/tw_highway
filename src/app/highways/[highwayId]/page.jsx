@@ -113,60 +113,60 @@ const HighwayContent = ({ params }) => {
       </Head>
       {data ? (
         <div className="container mx-auto px-4 py-6">
-          <h1 className="text-3xl font-semibold text-white-800 text-center">
+          <h1 className="text-5xl font-semibold text-white-800 text-center">
             {data.name}
           </h1>
 
           <section className="route-info bg-black-100 p-6 rounded-lg mt-8">
-            <h2 className="text-2xl font-semibold mb-4">路線資料</h2>
+            <h2 className="text-3xl font-semibold mb-4">路線資料</h2>
             {data.routeName && (
-              <p>
+              <h3 className="text-xl mb-4">
                 <strong>路線名稱:</strong> {data.routeName}
-              </p>
+              </h3>
             )}
-            <p>
+            <h3 className="text-xl mb-4">
               <strong>起點:</strong> {data.start}
-            </p>
+            </h3>
             {data.currentStart && (
-              <p>
+              <h3 className="text-xl mb-4">
                 <strong>通車起點:</strong> {data.currentStart}
-              </p>
+              </h3>
             )}
-            <p>
+            <h3 className="text-xl mb-4">
               <strong>終點:</strong> {data.end}
-            </p>
+            </h3>
             {data.currentEnd && (
-              <p>
+              <h3 className="text-xl mb-4">
                 <strong>通車終點:</strong> {data.currentEnd}
-              </p>
+              </h3>
             )}
-            <p>
+            <h3 className="text-xl mb-4">
               <strong>長度:</strong> {data.length} km
-            </p>
+            </h3>
             {data.currentLength && (
-              <p>
+              <h3 className="text-xl mb-4">
                 <strong>通車長度:</strong> {data.currentLength} km
-              </p>
+              </h3>
             )}
             {data.highest && (
-              <p>
+              <h3 className="text-xl mb-4">
                 <strong>最高海拔:</strong> {data.highest} m
-              </p>
+              </h3>
             )}
             {data.highestPlace && (
-              <p>
+              <h3 className="text-xl mb-4">
                 <strong>最高點:</strong> {data.highestPlace}
-              </p>
+              </h3>
             )}
             {data.otherName && (
-              <p>
+              <h3 className="text-xl mb-4">
                 <strong>別稱:</strong> {data.otherName}
-              </p>
+              </h3>
             )}
             {data.remark && (
-              <p>
+              <h3 className="text-xl mb-4">
                 <strong>備註:</strong> {data.remark}
-              </p>
+              </h3>
             )}
           </section>
 
@@ -222,13 +222,13 @@ const HighwayContent = ({ params }) => {
       <div className="container mx-auto mt-4 flex flex-row place-content-center">
         <button
           onClick={handleToListClick}
-          className="text-lg m-4 bg-green-500 text-white p-4 rounded hover:bg-green-600 flex flex-row"
+          className="text-lg m-4 bg-green-500 text-white p-4 rounded hover:bg-green-600 hover:text-yellow-300 flex flex-row"
         >
           <span>公路列表</span>
         </button>
         <button
           onClick={handleToHomeClick}
-          className="text-lg m-4 bg-green-500 text-white p-4 rounded hover:bg-green-600 flex flex-row"
+          className="text-lg m-4 bg-green-500 text-white p-4 rounded hover:bg-green-600 hover:text-yellow-300 flex flex-row"
         >
           <span>首頁</span>
         </button>
