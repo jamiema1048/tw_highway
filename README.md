@@ -44,3 +44,4 @@ npm install -D vitest
 npm install @testing-library/react @testing-library/jest-dom --save-dev  
 npm install msw  
 npm install @vitejs/plugin-react  
+npm install vite-plugin-magical-svg
