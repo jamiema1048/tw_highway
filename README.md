@@ -41,4 +41,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 npm install -g json-server  
 npm install eslint@latest postcss@latest tailwindcss@latest  
 npm install -D vitest  
-npm install @testing-library/react @testing-library/jest-dom --save-dev
+npm install @testing-library/react @testing-library/jest-dom --save-dev  
+npm install msw  
+npm install @vitejs/plugin-react  
+npm install vite-plugin-magical-svg
