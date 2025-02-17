@@ -4,6 +4,7 @@ import Head from "next/head";
 import { TitleContext } from "./../context/TitleContext";
 import Loading from "./loading";
 import { use, useState, useEffect, useContext } from "react";
+import Footer from "../footer/footer";
 
 const HighwayList = () => {
   const [highways, setHighways] = useState([]);
@@ -85,7 +86,10 @@ const HighwayList = () => {
   };
 
   return loading ? (
-    <Loading />
+    <>
+      <Loading />
+      <Footer />
+    </>
   ) : (
     <>
       <Head>
@@ -137,21 +141,8 @@ const HighwayList = () => {
             )}
           </div>
         </div>
-        <div className="container mx-auto mt-4 flex flex-row place-content-center">
-          <button
-            onClick={handleToHomeClick}
-            className="text-lg m-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 hover:text-yellow-300 flex flex-row"
-          >
-            <span>首頁</span>
-          </button>
-          <button
-            onClick={handleToTheMostClick}
-            className="text-lg m-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 hover:text-yellow-300 flex flex-row"
-          >
-            <span>公路之最</span>
-          </button>
-        </div>
       </div>
+      <Footer />
     </>
   );
 };

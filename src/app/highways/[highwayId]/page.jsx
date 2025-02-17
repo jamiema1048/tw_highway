@@ -6,6 +6,7 @@ import Head from "next/head";
 import Image from "next/image";
 import NotFound from "./not-found"; // ✅ 引入 not-found 頁面
 import Loading from "./loading";
+import Footer from "../../footer/footer";
 
 const HighwayContent = ({ params }) => {
   const [highwayId, setHighwayId] = useState(null);
@@ -16,8 +17,8 @@ const HighwayContent = ({ params }) => {
   const [notFoundPage, setNotFoundPage] = useState(false); // 🔥 追蹤是否顯示 404 頁面
 
   useEffect(() => {
-    // setTitle("載入中請稍後");
-    // document.title = "載入中請稍後";
+    setTitle("載入中請稍後");
+    document.title = "載入中請稍後";
     const unwrapParams = async () => {
       try {
         const unwrappedParams = await params; // 解包 params
@@ -105,7 +106,10 @@ const HighwayContent = ({ params }) => {
   };
 
   return loading ? (
-    <Loading />
+    <>
+      <Loading />
+      <Footer />
+    </>
   ) : (
     <>
       <Head>
@@ -219,20 +223,7 @@ const HighwayContent = ({ params }) => {
           <span className="ml-2 text-xl">Loading data...</span>
         </div>
       )}
-      <div className="container mx-auto mt-4 flex flex-row place-content-center">
-        <button
-          onClick={handleToListClick}
-          className="text-lg m-4 bg-green-500 text-white p-4 rounded hover:bg-green-600 hover:text-yellow-300 flex flex-row"
-        >
-          <span>公路列表</span>
-        </button>
-        <button
-          onClick={handleToHomeClick}
-          className="text-lg m-4 bg-green-500 text-white p-4 rounded hover:bg-green-600 hover:text-yellow-300 flex flex-row"
-        >
-          <span>首頁</span>
-        </button>
-      </div>
+      <Footer />
     </>
   );
 };

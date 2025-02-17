@@ -4,6 +4,7 @@ import Head from "next/head";
 import { TitleContext } from "../context/TitleContext";
 import Loading from "./loading";
 import { use, useState, useEffect, useContext } from "react";
+import Footer from "../footer/footer";
 const theMost = () => {
   const [highways, setHighways] = useState([]);
   const { title, setTitle } = useContext(TitleContext);
@@ -33,7 +34,10 @@ const theMost = () => {
     window.location.href = "/";
   };
   return loading ? (
-    <Loading />
+    <>
+      <Loading />
+      <Footer />
+    </>
   ) : (
     <>
       <Head>
@@ -342,21 +346,8 @@ const theMost = () => {
             </h3>
           </section>
         </div>
-        <div className="container mx-auto mt-4 flex flex-row place-content-center">
-          <button
-            onClick={handleToHomeClick}
-            className="text-lg m-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 hover:text-yellow-300 flex flex-row"
-          >
-            <span>首頁</span>
-          </button>
-          <button
-            onClick={handleToListClick}
-            className="text-lg m-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 hover:text-yellow-300 flex flex-row"
-          >
-            <span>公路列表</span>
-          </button>
-        </div>
       </div>
+      <Footer />
     </>
   );
 };
