@@ -42,4 +42,5 @@ npm install -g json-server
 npm install eslint@latest postcss@latest tailwindcss@latest  
 npm install -D vitest  
 npm install @testing-library/react @testing-library/jest-dom --save-dev  
-npm install msw
+npm install msw  
+npm install @vitejs/plugin-react  
