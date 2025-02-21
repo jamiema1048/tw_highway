@@ -14,7 +14,7 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:1120](http://localhost:1120) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
 
@@ -35,7 +35,7 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 ## To-Do
-1. Fix highways.test.js file    
+1. Fix test file fetch problem and API problem    
 2. Design UI  
 ## Require
 npm install -g json-server  
@@ -44,4 +44,5 @@ npm install -D vitest
 npm install @testing-library/react @testing-library/jest-dom --save-dev  
 npm install msw  
 npm install @vitejs/plugin-react  
-npm install vite-plugin-magical-svg
+npm install vite-plugin-magical-svg  
+npm install --save-dev @testing-library/user-event
