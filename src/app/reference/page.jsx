@@ -5,7 +5,7 @@ import { TitleContext } from "../context/TitleContext";
 //import Loading from "./loading";
 import { use, useState, useEffect, useContext } from "react";
 import Footer from "../footer/footer";
-const dataReference = () => {
+const DataReference = () => {
   const { title, setTitle } = useContext(TitleContext);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -15,6 +15,7 @@ const dataReference = () => {
   const handleToHomeClick = () => {
     window.location.href = "/";
   };
+  console.log("DataReference is rendering...");
   return (
     <>
       <Head>
@@ -22,7 +23,7 @@ const dataReference = () => {
       </Head>
       <div className="container mx-auto px-4 py-6">
         <h1 className="text-4xl font-bold text-white-800 text-center my-8">
-          公路之最
+          參考資料
         </h1>
         <div className="container mx-auto mt-4 flex flex-row place-content-center">
           <button
@@ -61,4 +62,4 @@ const dataReference = () => {
     </>
   );
 };
-export default dataReference;
+export default DataReference;

@@ -5,28 +5,36 @@ import { TitleContext } from "../context/TitleContext";
 import Loading from "./loading";
 import { use, useState, useEffect, useContext } from "react";
 import Footer from "../footer/footer";
-const theMost = () => {
+const TheMost = () => {
   const [highways, setHighways] = useState([]);
   const { title, setTitle } = useContext(TitleContext);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const fetchHighways = async () => {
+      console.log("Fetching highways..."); // 確認開始進行請求
+
       setLoading(true); // 確保進入 loading 狀態
       await new Promise((r) => setTimeout(r, 3000)); // 模擬網路延遲
+      console.log("Simulated delay complete."); // 確認延遲結束
+
       try {
         const response = await fetch("http://localhost:8000/highways"); // 替换为你的 API 地址
+        console.log("Response received:", response); // 確認收到回應
         if (!response.ok) throw new Error("Failed to fetch highways data");
         const data = await response.json();
+        console.log("Fetched data:", data); // 確認數據內容
         setHighways(data);
         setLoading(false);
       } catch (error) {
+        console.log("Error occurred:", error.message); // 捕獲錯誤並打印
         setError(error.message);
       }
     };
 
     fetchHighways();
   }, []);
+
   const handleToListClick = () => {
     window.location.href = "/highways";
   };
@@ -351,4 +359,4 @@ const theMost = () => {
     </>
   );
 };
-export default theMost;
+export default TheMost;
