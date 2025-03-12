@@ -36,7 +36,10 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 ## To-Do
 1. Fix test file fetch problem and API problem    
-2. Design UI  
+2. Design UI
+3. The card will disappear when click next image button at the last second img, Fix it  
+4. When mouse move out of link, unless it move through card, the card won't disappear, Fix it
+5. Design transition animation   
 ## Require
 npm install -g json-server  
 npm install eslint@latest postcss@latest tailwindcss@latest  
