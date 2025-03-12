@@ -18,6 +18,7 @@ export default defineConfig({
       reporter: ["text", "json", "html"], // 生成多種格式的測試報告
     },
     testTimeout: 10000, // 測試超時時間（避免 API 測試時 timeout）
+    reporters: ["verbose"],
   },
   resolve: {
     alias: {
