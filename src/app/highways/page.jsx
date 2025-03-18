@@ -3,12 +3,13 @@ import Link from "next/link";
 import Head from "next/head";
 import { TitleContext } from "./../context/TitleContext";
 import Loading from "./loading";
-import { use, useState, useEffect, useContext } from "react";
+import { use, useState, useEffect, useContext, useRef } from "react";
 import Footer from "../footer/footer";
 
 const HighwayList = () => {
   const [highways, setHighways] = useState([]);
   const { title, setTitle } = useContext(TitleContext);
+  const timeoutRef = useRef(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isProvinceShow, setIsProvinceShow] = useState(false);
@@ -140,32 +141,37 @@ const HighwayList = () => {
 
   // 當游標進入 link 時顯示字卡
   const handleMouseEnter = (highway) => {
+    // 清除任何即將執行的隱藏計時器
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
     setHoveredHighway(highway);
-    setIsCardVisible(true); // 顯示字卡
+    setIsCardVisible(true);
   };
 
-  // 當游標離開 link 時延遲隱藏字卡
   const handleMouseLeave = () => {
-    setTimeout(() => {
-      if (!isCardVisible) {
-        setHoveredHighway(null); // 如果字卡已經隱藏，則清空 hover 狀態
-      }
-    }, 300); // 延遲隱藏
-    setIsCardVisible(false);
+    // 設置 300ms 延遲，確保如果滑鼠沒有進入字卡，就隱藏
+    timeoutRef.current = setTimeout(() => {
+      setIsCardVisible(false);
+      setHoveredHighway(null);
+    }, 300);
   };
 
   // 當游標進入字卡時，防止觸發隱藏
   const handleCardMouseEnter = () => {
-    setIsCardVisible(true); // 當游標在字卡上時，顯示字卡
+    // 清除計時器，避免字卡被意外隱藏
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    setIsCardVisible(true);
   };
 
-  // 當游標離開字卡時，隱藏字卡
   const handleCardMouseLeave = () => {
-    // 確保在游標離開字卡時字卡隱藏
-    setTimeout(() => {
+    // 當滑鼠離開字卡時，確保隱藏
+    timeoutRef.current = setTimeout(() => {
       setIsCardVisible(false);
-      setHoveredHighway(null); // 確保游標離開時清除
-    }, 300); // 延遲隱藏
+      setHoveredHighway(null);
+    }, 300);
   };
 
   const handleToHomeClick = () => {
@@ -216,7 +222,8 @@ const HighwayList = () => {
                 handleMouseEnter(highway);
               }}
               onMouseLeave={() => {
-                handleMouseLeave;
+                handleMouseLeave();
+                console.log("Left Hover on:", highway.name);
               }}
               onTouchStart={() => handleTouchStart(highway)}
               onTouchEnd={handleTouchEnd}
@@ -228,7 +235,7 @@ const HighwayList = () => {
                 : highway.name}
             </Link>
             {/* 浮動字卡 */}
-            {hoveredHighway?.id === highway.id && (
+            {hoveredHighway?.id === highway.id && isCardVisible ? (
               <div
                 className="absolute bottom-full left-36 transform -translate-x-1/2 mb-4 w-80 p-4 bg-white border border-gray-300 shadow-lg rounded-lg z-50 highway-card"
                 onMouseEnter={handleCardMouseEnter} // 當游標進入字卡時，不觸發隱藏
@@ -248,25 +255,34 @@ const HighwayList = () => {
                     />
 
                     {/* 只有當圖片索引大於0時，顯示上一張按鈕 */}
-                    {hoveredHighway.currentImageIndex > 0 && (
-                      <button
-                        className="absolute top-1/2 left-0 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full z-10"
-                        onClick={handlePrevImage}
-                      >
-                        ◀
-                      </button>
-                    )}
+                    <button
+                      className={`absolute top-1/2 left-0 transform ${
+                        hoveredHighway.currentImageIndex > 0
+                          ? "block"
+                          : "hidden"
+                      } -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full z-10`}
+                      onClick={handlePrevImage}
+                      disabled={hoveredHighway.currentImageIndex <= 0}
+                    >
+                      ◀
+                    </button>
 
                     {/* 只有當圖片索引小於圖片數量減一時，顯示下一張按鈕 */}
-                    {hoveredHighway.currentImageIndex <
-                      hoveredHighway.images.length - 1 && (
-                      <button
-                        className="absolute top-1/2 right-0 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full z-10"
-                        onClick={handleNextImage}
-                      >
-                        ▶
-                      </button>
-                    )}
+                    <button
+                      className={`absolute top-1/2 right-0 transform ${
+                        hoveredHighway.currentImageIndex <
+                        hoveredHighway.images.length - 1
+                          ? "block"
+                          : "hidden"
+                      } -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full z-10`}
+                      onClick={handleNextImage}
+                      disabled={
+                        hoveredHighway.currentImageIndex >=
+                        hoveredHighway.images.length - 1
+                      }
+                    >
+                      ▶
+                    </button>
                   </div>
                 ) : hoveredHighway.images &&
                   hoveredHighway.images.length === 1 ? (
@@ -284,6 +300,14 @@ const HighwayList = () => {
                     <span className="text-gray-500">No image to show</span>
                   </div>
                 )}
+                {hoveredHighway.images && hoveredHighway.images.length > 0 ? (
+                  <p className="text-sm text-black font-semibold mt-2">
+                    {hoveredHighway.currentImageIndex + 1}/
+                    {hoveredHighway.images.length}
+                  </p>
+                ) : (
+                  <></>
+                )}
 
                 <p className="text-sm text-black font-semibold mt-2">
                   {hoveredHighway.name}
@@ -292,6 +316,8 @@ const HighwayList = () => {
                   {hoveredHighway.routeName}
                 </p>
               </div>
+            ) : (
+              <></>
             )}
           </h3>
         ))}
