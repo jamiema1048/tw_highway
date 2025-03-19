@@ -18,6 +18,14 @@ const HighwayList = () => {
   const [groupedHighways, setGroupedHighways] = useState({});
   const [touchTimeout, setTouchTimeout] = useState(null);
   const [isCardVisible, setIsCardVisible] = useState(false); // 用來控制顯示字卡的狀態
+  const [isCountyShowCXX, setIsCountyShowCXX] = useState(false); //101~120
+  const [isCountyShowCXL, setIsCountyShowCXL] = useState(false); //121~140
+  const [isCountyShowCLX, setIsCountyShowCLX] = useState(false); //141~160
+  const [isCountyShowCLXXX, setIsCountyShowCLXXX] = useState(false); //161~180
+  const [isCountyShowCC, setIsCountyShowCC] = useState(false); //181~200
+  const [isCountyShowCCXX, setIsCountyShowCCXX] = useState(false); //201~220
+  const [isProvinceShowXX, setIsProvinceShowXX] = useState(false); //1~20
+  const [isProvinceShowC, setIsProvinceShowC] = useState(false); //21~
   // useEffect(() => {
   //   if (loading == true) {
   //     setTitle("載入中請稍後");
@@ -181,20 +189,38 @@ const HighwayList = () => {
     window.location.href = "/themost";
   };
 
-  // 舊分區資料
-  const section1 = highways.filter(
-    (highway) => highway.id / 10000 >= 1 && highway.id / 10000 < 3
-  );
+  // // 舊分區資料
+  // const section1 = highways.filter(
+  //   (highway) => highway.id / 10000 >= 1 && highway.id / 10000 < 3
+  // );
   const section2 = highways.filter(
     (highway) => highway.id / 10000 >= 4 && highway.id / 10000 < 5
   );
   // 新分區資料
-  // const section1 = highways.filter(
-  //   (highway) => highway.id / 10000 >= 1 && highway.id / 10000 < 3
-  // );
-  // const section2 = highways.filter(
-  //   (highway) => highway.id / 10000 >= 4 && highway.id / 10000 < 5
-  // );
+  const section120 = highways.filter(
+    (highway) => highway.id / 100 >= 100 && highway.id / 100 < 121
+  );
+  const section140 = highways.filter(
+    (highway) => highway.id / 100 >= 121 && highway.id / 100 < 141
+  );
+  const section160 = highways.filter(
+    (highway) => highway.id / 100 >= 141 && highway.id / 100 < 161
+  );
+  const section180 = highways.filter(
+    (highway) => highway.id / 100 >= 161 && highway.id / 100 < 181
+  );
+  const section200 = highways.filter(
+    (highway) => highway.id / 100 >= 181 && highway.id / 100 < 201
+  );
+  const section220 = highways.filter(
+    (highway) => highway.id / 100 >= 201 && highway.id / 100 < 220
+  );
+  const section420 = highways.filter(
+    (highway) => highway.id / 100 >= 400 && highway.id / 100 < 421
+  );
+  const section440 = highways.filter(
+    (highway) => highway.id / 100 >= 421 && highway.id / 100 < 500
+  );
 
   // 分組相同前三碼的 ID
   const groupByPrefix = (section) => {
@@ -358,28 +384,71 @@ const HighwayList = () => {
           {/* 第二區域: 省道 */}
           <div className=" ml-3 md:ml-6 lg:ml-9 mt-4 h-md:mt-6 h-lg:mt-8">
             <h2
-              className="text-4xl font-semibold text-white-700 cursor-pointer max-w-fit mb-2 h-md:mb-3 h-lg:mb-4 lg:pr-3"
+              className={`text-4xl font-semibold text-white-700 text-white-600 ${
+                isProvinceShow ? "text-yellow-400" : "text-white-600"
+              } cursor-pointer max-w-fit mb-2 h-md:mb-3 h-lg:mb-4 lg:pr-3`}
               onClick={() => setIsProvinceShow((prev) => !prev)}
             >
               省道 {isProvinceShow ? "▲" : "▼"}
             </h2>
             {isProvinceShow ? (
-              section2.length > 0 ? (
+              <>
                 <div className="space-y-4 ml-4">
-                  {renderGroupedHighways(groupByPrefix(section2))}
+                  <h3
+                    className={`text-2xl ${
+                      isProvinceShowXX ? "text-yellow-400" : "text-white-600"
+                    } cursor-pointer font-semibold`}
+                    onClick={() => setIsProvinceShowXX((prev) => !prev)}
+                  >
+                    1~20 {isProvinceShowXX ? "▲" : "▼"}
+                  </h3>
+                  {isProvinceShowXX ? (
+                    <>
+                      {section2.length > 0 ? (
+                        <div className="space-y-4 ml-4">
+                          {renderGroupedHighways(groupByPrefix(section420))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500">
+                          No highways found in this range.
+                        </p>
+                      )}
+                    </>
+                  ) : null}
                 </div>
-              ) : (
-                <p className="text-gray-500">
-                  No highways found in this range.
-                </p>
-              )
+                <div className="space-y-4 ml-4">
+                  <h3
+                    className={`text-2xl ${
+                      isProvinceShowC ? "text-yellow-400" : "text-white-600"
+                    } cursor-pointer font-semibold`}
+                    onClick={() => setIsProvinceShowC((prev) => !prev)}
+                  >
+                    21~ {isProvinceShowC ? "▲" : "▼"}
+                  </h3>
+                  {isProvinceShowC ? (
+                    <>
+                      {section2.length > 0 ? (
+                        <div className="space-y-4 ml-4">
+                          {renderGroupedHighways(groupByPrefix(section440))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500">
+                          No highways found in this range.
+                        </p>
+                      )}
+                    </>
+                  ) : null}
+                </div>
+              </>
             ) : null}
           </div>
 
           {/* 第一區域: 縣市道 */}
           <div className="ml-3 md:ml-6 lg:ml-9 mt-4 h-md:mt-6 h-lg:mt-8">
             <h2
-              className="text-4xl font-semibold text-white-700 cursor-pointer max-w-fit mb-2 h-md:mb-3 h-lg:mb-4 lg:pr-3"
+              className={`text-4xl font-semibold text-white-700 text-white-600 ${
+                isCountyShow ? "text-yellow-400" : "text-white-600"
+              } cursor-pointer max-w-fit mb-2 h-md:mb-3 h-lg:mb-4 lg:pr-3`}
               onClick={() => setIsCountyShow((prev) => !prev)}
             >
               縣市道 {isCountyShow ? "▲" : "▼"}
@@ -388,25 +457,135 @@ const HighwayList = () => {
             {isCountyShow ? (
               <>
                 <div className="space-y-4 ml-4">
-                  <h3 className="text-xl">101~120</h3>
+                  <h3
+                    className={`text-2xl ${
+                      isCountyShowCXX ? "text-yellow-400" : "text-white-600"
+                    } cursor-pointer font-semibold`}
+                    onClick={() => setIsCountyShowCXX((prev) => !prev)}
+                  >
+                    101~120 {isCountyShowCXX ? "▲" : "▼"}
+                  </h3>
+                  {isCountyShowCXX ? (
+                    <>
+                      {section120.length > 0 ? (
+                        <div className="space-y-4 ml-4">
+                          {renderGroupedHighways(groupByPrefix(section120))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500">
+                          No highways found in this range.
+                        </p>
+                      )}
+                    </>
+                  ) : null}
                 </div>
                 <div className="space-y-4 ml-4">
-                  <h3 className="text-xl">121~140</h3>
+                  <h3
+                    className={`text-2xl ${
+                      isCountyShowCXL ? "text-yellow-400" : "text-white-600"
+                    } cursor-pointer font-semibold`}
+                    onClick={() => setIsCountyShowCXL((prev) => !prev)}
+                  >
+                    121~140 {isCountyShowCXL ? "▲" : "▼"}
+                  </h3>
+                  {isCountyShowCXL ? (
+                    section140.length > 0 ? (
+                      <div className="space-y-4 ml-4">
+                        {renderGroupedHighways(groupByPrefix(section140))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500">
+                        No highways found in this range.
+                      </p>
+                    )
+                  ) : null}
                 </div>
                 <div className="space-y-4 ml-4">
-                  <h3 className="text-xl">141~160</h3>
+                  <h3
+                    className={`text-2xl ${
+                      isCountyShowCLX ? "text-yellow-400" : "text-white-600"
+                    } cursor-pointer font-semibold`}
+                    onClick={() => setIsCountyShowCLX((prev) => !prev)}
+                  >
+                    141~160 {isCountyShowCLX ? "▲" : "▼"}
+                  </h3>
+                  {isCountyShowCLX ? (
+                    section160.length > 0 ? (
+                      <div className="space-y-4 ml-4">
+                        {renderGroupedHighways(groupByPrefix(section160))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500">
+                        No highways found in this range.
+                      </p>
+                    )
+                  ) : null}
                 </div>
                 <div className="space-y-4 ml-4">
-                  <h3 className="text-xl">161~180</h3>
+                  <h3
+                    className={`text-2xl ${
+                      isCountyShowCLXXX ? "text-yellow-400" : "text-white-600"
+                    } cursor-pointer font-semibold`}
+                    onClick={() => setIsCountyShowCLXXX((prev) => !prev)}
+                  >
+                    161~180 {isCountyShowCLXXX ? "▲" : "▼"}
+                  </h3>
+                  {isCountyShowCLXXX ? (
+                    section180.length > 0 ? (
+                      <div className="space-y-4 ml-4">
+                        {renderGroupedHighways(groupByPrefix(section180))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500">
+                        No highways found in this range.
+                      </p>
+                    )
+                  ) : null}
                 </div>
                 <div className="space-y-4 ml-4">
-                  <h3 className="text-xl">181~200</h3>
+                  <h3
+                    className={`text-2xl ${
+                      isCountyShowCC ? "text-yellow-400" : "text-white-600"
+                    } cursor-pointer font-semibold`}
+                    onClick={() => setIsCountyShowCC((prev) => !prev)}
+                  >
+                    181~200 {isCountyShowCC ? "▲" : "▼"}
+                  </h3>
+                  {isCountyShowCC ? (
+                    section200.length > 0 ? (
+                      <div className="space-y-4 ml-4">
+                        {renderGroupedHighways(groupByPrefix(section200))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500">
+                        No highways found in this range.
+                      </p>
+                    )
+                  ) : null}
                 </div>
                 <div className="space-y-4 ml-4">
-                  <h3 className="text-xl">201~</h3>
+                  <h3
+                    className={`text-2xl ${
+                      isCountyShowCCXX ? "text-yellow-400" : "text-white-600"
+                    } cursor-pointer font-semibold`}
+                    onClick={() => setIsCountyShowCCXX((prev) => !prev)}
+                  >
+                    201~ {isCountyShowCCXX ? "▲" : "▼"}
+                  </h3>
+                  {isCountyShowCCXX ? (
+                    section220.length > 0 ? (
+                      <div className="space-y-4 ml-4">
+                        {renderGroupedHighways(groupByPrefix(section220))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500">
+                        No highways found in this range.
+                      </p>
+                    )
+                  ) : null}
                 </div>
                 <div>
-                  {section1.length > 0 ? (
+                  {/* {section1.length > 0 ? (
                     <div className="space-y-4 ml-4">
                       {renderGroupedHighways(groupByPrefix(section1))}
                     </div>
@@ -414,7 +593,7 @@ const HighwayList = () => {
                     <p className="text-gray-500">
                       No highways found in this range.
                     </p>
-                  )}
+                  )} */}
                 </div>
               </>
             ) : null}
