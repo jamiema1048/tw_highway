@@ -242,7 +242,7 @@ const HighwayList = () => {
           <h3 key={highway.id} className="relative text-xl">
             <Link
               href={`highways/${highway.id}`}
-              className="font-bold text-white-600 hover:text-yellow-400"
+              className="font-bold text-white-600 hover:text-yellow-400 active:text-yellow-600"
               onMouseEnter={() => {
                 console.log("Hover on:", highway.name);
                 handleMouseEnter(highway);
@@ -368,13 +368,13 @@ const HighwayList = () => {
         <div className="container mx-auto mt-4 flex flex-row place-content-center">
           <button
             onClick={handleToHomeClick}
-            className="text-lg m-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 hover:text-yellow-300 flex flex-row"
+            className="text-lg m-4 bg-green-500 text-white hover:text-yellow-300 active:text-yellow-600 p-4 rounded hover:bg-green-600 active:bg-green-800 active:shadow-green-400 active:shadow-md flex flex-row"
           >
             <span>首頁</span>
           </button>
           <button
             onClick={handleToTheMostClick}
-            className="text-lg m-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 hover:text-yellow-300 flex flex-row"
+            className="text-lg m-4 bg-green-500 text-white hover:text-yellow-300 active:text-yellow-600 p-4 rounded hover:bg-green-600 active:bg-green-800 active:shadow-green-400 active:shadow-md flex flex-row"
           >
             <span>公路之最</span>
           </button>
@@ -386,7 +386,7 @@ const HighwayList = () => {
             <h2
               className={`text-4xl font-semibold text-white-700 text-white-600 ${
                 isProvinceShow ? "text-yellow-400" : "text-white-600"
-              } cursor-pointer max-w-fit mb-2 h-md:mb-3 h-lg:mb-4 lg:pr-3`}
+              } active:text-yellow-600 cursor-pointer max-w-fit mb-2 h-md:mb-3 h-lg:mb-4 lg:pr-3`}
               onClick={() => setIsProvinceShow((prev) => !prev)}
             >
               省道 {isProvinceShow ? "▲" : "▼"}
@@ -397,7 +397,7 @@ const HighwayList = () => {
                   <h3
                     className={`text-2xl ${
                       isProvinceShowXX ? "text-yellow-400" : "text-white-600"
-                    } cursor-pointer font-semibold`}
+                    } active:text-yellow-600 cursor-pointer font-semibold`}
                     onClick={() => setIsProvinceShowXX((prev) => !prev)}
                   >
                     1~20 {isProvinceShowXX ? "▲" : "▼"}
@@ -420,7 +420,7 @@ const HighwayList = () => {
                   <h3
                     className={`text-2xl ${
                       isProvinceShowC ? "text-yellow-400" : "text-white-600"
-                    } cursor-pointer font-semibold`}
+                    } active:text-yellow-600 cursor-pointer font-semibold`}
                     onClick={() => setIsProvinceShowC((prev) => !prev)}
                   >
                     21~ {isProvinceShowC ? "▲" : "▼"}
@@ -448,7 +448,7 @@ const HighwayList = () => {
             <h2
               className={`text-4xl font-semibold text-white-700 text-white-600 ${
                 isCountyShow ? "text-yellow-400" : "text-white-600"
-              } cursor-pointer max-w-fit mb-2 h-md:mb-3 h-lg:mb-4 lg:pr-3`}
+              } active:text-yellow-600 cursor-pointer max-w-fit mb-2 h-md:mb-3 h-lg:mb-4 lg:pr-3`}
               onClick={() => setIsCountyShow((prev) => !prev)}
             >
               縣市道 {isCountyShow ? "▲" : "▼"}
@@ -460,7 +460,7 @@ const HighwayList = () => {
                   <h3
                     className={`text-2xl ${
                       isCountyShowCXX ? "text-yellow-400" : "text-white-600"
-                    } cursor-pointer font-semibold`}
+                    } active:text-yellow-600 cursor-pointer font-semibold`}
                     onClick={() => setIsCountyShowCXX((prev) => !prev)}
                   >
                     101~120 {isCountyShowCXX ? "▲" : "▼"}
@@ -483,7 +483,7 @@ const HighwayList = () => {
                   <h3
                     className={`text-2xl ${
                       isCountyShowCXL ? "text-yellow-400" : "text-white-600"
-                    } cursor-pointer font-semibold`}
+                    } active:text-yellow-600 cursor-pointer font-semibold`}
                     onClick={() => setIsCountyShowCXL((prev) => !prev)}
                   >
                     121~140 {isCountyShowCXL ? "▲" : "▼"}
@@ -504,7 +504,7 @@ const HighwayList = () => {
                   <h3
                     className={`text-2xl ${
                       isCountyShowCLX ? "text-yellow-400" : "text-white-600"
-                    } cursor-pointer font-semibold`}
+                    } active:text-yellow-600 cursor-pointer font-semibold`}
                     onClick={() => setIsCountyShowCLX((prev) => !prev)}
                   >
                     141~160 {isCountyShowCLX ? "▲" : "▼"}
@@ -525,7 +525,7 @@ const HighwayList = () => {
                   <h3
                     className={`text-2xl ${
                       isCountyShowCLXXX ? "text-yellow-400" : "text-white-600"
-                    } cursor-pointer font-semibold`}
+                    } active:text-yellow-600 cursor-pointer font-semibold`}
                     onClick={() => setIsCountyShowCLXXX((prev) => !prev)}
                   >
                     161~180 {isCountyShowCLXXX ? "▲" : "▼"}
@@ -546,7 +546,7 @@ const HighwayList = () => {
                   <h3
                     className={`text-2xl ${
                       isCountyShowCC ? "text-yellow-400" : "text-white-600"
-                    } cursor-pointer font-semibold`}
+                    } active:text-yellow-600 cursor-pointer font-semibold`}
                     onClick={() => setIsCountyShowCC((prev) => !prev)}
                   >
                     181~200 {isCountyShowCC ? "▲" : "▼"}
@@ -567,7 +567,7 @@ const HighwayList = () => {
                   <h3
                     className={`text-2xl ${
                       isCountyShowCCXX ? "text-yellow-400" : "text-white-600"
-                    } cursor-pointer font-semibold`}
+                    } active:text-yellow-600 cursor-pointer font-semibold`}
                     onClick={() => setIsCountyShowCCXX((prev) => !prev)}
                   >
                     201~ {isCountyShowCCXX ? "▲" : "▼"}

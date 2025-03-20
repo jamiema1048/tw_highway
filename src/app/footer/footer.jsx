@@ -23,14 +23,14 @@ const Footer = () => {
           <div className="container mx-auto mt-4 flex flex-row place-content-center">
             <button
               onClick={handleToHomeClick}
-              className="text-lg m-4 bg-green-500 text-white hover:text-yellow-300 p-4 rounded hover:bg-green-600 flex flex-row"
+              className="text-lg m-4 bg-green-500 text-white hover:text-yellow-300 active:text-yellow-600 p-4 rounded hover:bg-green-600 active:bg-green-800 active:shadow-green-400 active:shadow-md flex flex-row"
             >
               <span>首頁</span>
             </button>
             {pathname !== "/highways" && (
               <button
                 onClick={handleToListClick}
-                className="text-lg m-4 bg-green-500 text-white hover:text-yellow-300 p-4 rounded hover:bg-green-600 flex flex-row"
+                className="text-lg m-4 bg-green-500 text-white hover:text-yellow-300 active:text-yellow-600 p-4 rounded hover:bg-green-600 active:bg-green-800 active:shadow-green-400 active:shadow-md flex flex-row"
               >
                 <span>公路列表</span>
               </button>
@@ -38,7 +38,7 @@ const Footer = () => {
             {pathname !== "/themost" && (
               <button
                 onClick={handleToTheMostClick}
-                className="text-lg m-4 bg-green-500 text-white hover:text-yellow-300 p-4 rounded hover:bg-green-600 flex flex-row"
+                className="text-lg m-4 bg-green-500 text-white hover:text-yellow-300 active:text-yellow-600 p-4 rounded hover:bg-green-600 active:bg-green-800 active:shadow-green-400 active:shadow-md flex flex-row"
               >
                 <span>公路之最</span>
               </button>
@@ -46,7 +46,7 @@ const Footer = () => {
             {pathname !== "/reference" && (
               <button
                 onClick={handleToReferenceClick}
-                className="text-lg m-4 bg-green-500 text-white hover:text-yellow-300 p-4 rounded hover:bg-green-600 flex flex-row"
+                className="text-lg m-4 bg-green-500 text-white hover:text-yellow-300 active:text-yellow-600 p-4 rounded hover:bg-green-600 active:bg-green-800 active:shadow-green-400 active:shadow-md flex flex-row"
               >
                 <span>參考資料</span>
               </button>

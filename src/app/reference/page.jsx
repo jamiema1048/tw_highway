@@ -28,13 +28,13 @@ const DataReference = () => {
         <div className="container mx-auto mt-4 flex flex-row place-content-center">
           <button
             onClick={handleToHomeClick}
-            className="text-lg m-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 hover:text-yellow-300 flex flex-row"
+            className="text-lg m-4 bg-green-500 text-white hover:text-yellow-300 active:text-yellow-600 p-4 rounded hover:bg-green-600 active:bg-green-800 active:shadow-green-400 active:shadow-md flex flex-row"
           >
             <span>首頁</span>
           </button>
           <button
             onClick={handleToListClick}
-            className="text-lg m-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 hover:text-yellow-300 flex flex-row"
+            className="text-lg m-4 bg-green-500 text-white hover:text-yellow-300 active:text-yellow-600 p-4 rounded hover:bg-green-600 active:bg-green-800 active:shadow-green-400 active:shadow-md flex flex-row"
           >
             <span>公路列表</span>
           </button>
@@ -47,7 +47,7 @@ const DataReference = () => {
               <strong>1. </strong>{" "}
               <Link
                 href={"https://twroad.org/"}
-                className="font-bold text-white-600 hover:text-yellow-400"
+                className="font-bold text-white-600 hover:text-yellow-400 active:text-yellow-600 cursor-pointer"
               >
                 公路邦
               </Link>
