@@ -45,12 +45,24 @@ const HighwayCard = ({ highway, hoveredHighway, setHoveredHighway }) => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-    setHoveredHighway(highway);
+    // 只有當 hoveredHighway 不同時才更新狀態，避免不必要的重渲染
+    if (!hoveredHighway || hoveredHighway.id !== highway.id) {
+      setHoveredHighway(highway);
+    }
     setIsCardVisible(true);
   };
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = (event) => {
     timeoutRef.current = setTimeout(() => {
+      // 如果滑鼠進入其他 Link，則不關閉字卡
+      const relatedTarget = event.relatedTarget;
+      if (
+        relatedTarget &&
+        (relatedTarget.closest("a") || relatedTarget.closest(".highway-card"))
+      ) {
+        return;
+      }
+
       setIsCardVisible(false);
       setHoveredHighway(null);
     }, 300);
