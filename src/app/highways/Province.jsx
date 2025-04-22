@@ -3,13 +3,23 @@ import HighwayCard from "./HighwayCard";
 import { use, useState, useEffect, useContext, useRef } from "react";
 import React from "react";
 
-const Province = () => {
-  const [highways, setHighways] = useState([]);
+const Province = ({
+  highways,
+  setHighways,
+  hoveredHighway,
+  setHoveredHighway,
+  loading,
+  setLoading,
+  error,
+  setError,
+  changeHighwayCard,
+}) => {
+  //const [highways, setHighways] = useState([]);
   const timeoutRef = useRef(null);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // const [error, setError] = useState(null);
+  // const [loading, setLoading] = useState(true);
   const [isProvinceShow, setIsProvinceShow] = useState(false);
-  const [hoveredHighway, setHoveredHighway] = useState(null);
+  //const [hoveredHighway, setHoveredHighway] = useState(null);
   const [groupedHighways, setGroupedHighways] = useState({});
   const [isProvinceShowXX, setIsProvinceShowXX] = useState(false); //1~20
   const [isProvinceShowC, setIsProvinceShowC] = useState(false); //21~
@@ -118,6 +128,11 @@ const Province = () => {
             highway={highway}
             hoveredHighway={hoveredHighway}
             setHoveredHighway={setHoveredHighway}
+            loading={loading}
+            setLoading={setLoading}
+            error={error}
+            setError={setError}
+            changeHighwayCard={changeHighwayCard}
           />
         ))}
       </div>

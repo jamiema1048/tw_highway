@@ -1,15 +1,25 @@
 import { useState, useRef } from "react";
 import Link from "next/link";
 
-const HighwayCard = ({ highway, hoveredHighway, setHoveredHighway }) => {
+const HighwayCard = ({
+  highway,
+  hoveredHighway,
+  setHoveredHighway,
+  loading,
+  setLoading,
+  error,
+  setError,
+  changeHighwayCard,
+}) => {
   const [isCardVisible, setIsCardVisible] = useState(false);
   const timeoutRef = useRef(null);
+  let mutex = Promise.resolve();
 
   // 處理手機長按
   const handleTouchStart = (highway) => {
     if (touchTimeout) clearTimeout(touchTimeout);
     const timeout = setTimeout(() => {
-      setHoveredHighway(highway);
+      changeHighwayCard(highway);
     }, 500); // 0.5秒後才觸發，避免短按立即觸發
     setTouchTimeout(timeout);
   };
@@ -26,7 +36,7 @@ const HighwayCard = ({ highway, hoveredHighway, setHoveredHighway }) => {
       hoveredHighway.images &&
       hoveredHighway.currentImageIndex < hoveredHighway.images.length - 1
     ) {
-      setHoveredHighway((prev) => ({
+      changeHighwayCard((prev) => ({
         ...prev,
         currentImageIndex: prev.currentImageIndex + 1,
       }));
@@ -35,7 +45,7 @@ const HighwayCard = ({ highway, hoveredHighway, setHoveredHighway }) => {
 
   const handlePrevImage = () => {
     if (hoveredHighway && hoveredHighway.currentImageIndex > 0) {
-      setHoveredHighway((prev) => ({
+      changeHighwayCard((prev) => ({
         ...prev,
         currentImageIndex: prev.currentImageIndex - 1,
       }));
@@ -45,14 +55,35 @@ const HighwayCard = ({ highway, hoveredHighway, setHoveredHighway }) => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-    // 只有當 hoveredHighway 不同時才更新狀態，避免不必要的重渲染
-    if (!hoveredHighway || hoveredHighway.id !== highway.id) {
-      setHoveredHighway(highway);
-    }
-    setIsCardVisible(true);
+    // async function writeCard() {
+    //   // 只有當 hoveredHighway 不同時才更新狀態，避免不必要的重渲染
+    //   if (!hoveredHighway || hoveredHighway.id !== highway.id) {
+    //     await Promise.all([changeHighwayCard(highway), setIsCardVisible(true)]);
+    //   } else {
+    //     await Promise.all([setIsCardVisible(true)]);
+    //   }
+    // }
+    // writeCard();
+    timeoutRef.current = setTimeout(() => {
+      // 只有當 hoveredHighway 不同時才更新狀態，避免不必要的重渲染
+      if (!hoveredHighway || hoveredHighway.id !== highway.id) {
+        changeHighwayCard(highway);
+      }
+      setIsCardVisible(true);
+    }, 300);
   };
 
   const handleMouseLeave = (event) => {
+    // const relatedTarget = event.relatedTarget;
+    // if (
+    //   relatedTarget &&
+    //   (relatedTarget.closest("a") || relatedTarget.closest(".highway-card"))
+    // ) {
+    //   return;
+    // }
+
+    // setIsCardVisible(false);
+    // changeHighwayCard(null);
     timeoutRef.current = setTimeout(() => {
       // 如果滑鼠進入其他 Link，則不關閉字卡
       const relatedTarget = event.relatedTarget;
@@ -63,8 +94,10 @@ const HighwayCard = ({ highway, hoveredHighway, setHoveredHighway }) => {
         return;
       }
 
-      setIsCardVisible(false);
-      setHoveredHighway(null);
+      async function clearCard() {
+        await Promise.all([setIsCardVisible(false), changeHighwayCard(null)]);
+      }
+      clearCard();
     }, 300);
   };
 
@@ -78,7 +111,7 @@ const HighwayCard = ({ highway, hoveredHighway, setHoveredHighway }) => {
   const handleCardMouseLeave = () => {
     timeoutRef.current = setTimeout(() => {
       setIsCardVisible(false);
-      setHoveredHighway(null);
+      changeHighwayCard(null);
     }, 300);
   };
 

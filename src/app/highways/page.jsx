@@ -18,6 +18,7 @@ const HighwayList = () => {
   const [groupedHighways, setGroupedHighways] = useState({});
   const [touchTimeout, setTouchTimeout] = useState(null);
   const [isCardVisible, setIsCardVisible] = useState(false); // 用來控制顯示字卡的狀態
+  const mutexRef = useRef(Promise.resolve());
 
   useEffect(() => {
     const fetchHighways = async () => {
@@ -80,6 +81,18 @@ const HighwayList = () => {
 
     fetchHighways();
   }, []);
+  async function changeHighwayCard(value) {
+    mutexRef.current = mutexRef.current
+      .then(async () => {
+        console.log(`starting change card`);
+        setHoveredHighway(value);
+        console.log(`card already changed`);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+    return mutexRef.current;
+  }
 
   // 點擊其他地方時關閉字卡
   useEffect(() => {
@@ -88,7 +101,7 @@ const HighwayList = () => {
         !event.target.closest(".highway-card") &&
         !event.target.closest(".highway-link")
       ) {
-        setHoveredHighway(null);
+        changeHighwayCard(null);
       }
     };
 
@@ -133,8 +146,28 @@ const HighwayList = () => {
         </div>
 
         <div className=" pl-1 md:pl-3 lg:pl-5">
-          <Province />
-          <County />
+          <Province
+            hoveredHighway={hoveredHighway}
+            setHoveredHighway={setHoveredHighway}
+            highways={highways}
+            setHighways={setHighways}
+            loading={loading}
+            setLoading={setLoading}
+            error={error}
+            setError={setError}
+            changeHighwayCard={changeHighwayCard}
+          />
+          <County
+            hoveredHighway={hoveredHighway}
+            setHoveredHighway={setHoveredHighway}
+            highways={highways}
+            setHighways={setHighways}
+            loading={loading}
+            setLoading={setLoading}
+            error={error}
+            setError={setError}
+            changeHighwayCard={changeHighwayCard}
+          />
         </div>
       </div>
       <Footer />
