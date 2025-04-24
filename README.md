@@ -38,7 +38,8 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 1. Fix test file fetch problem and API problem    
 2. Design UI
 3. The card will disappear when mouse move from a link to another, Fix it  
-4. Design transition animation   
+4. Design transition animation
+5. theMost can't request title, fix it!!!!!
 ## Require
 npm install -g json-server  
 npm install eslint@latest postcss@latest tailwindcss@latest  
