@@ -3,44 +3,147 @@ import Link from "next/link";
 import Head from "next/head";
 import { TitleContext } from "../context/TitleContext";
 import Loading from "./loading";
-import { use, useState, useEffect, useContext } from "react";
+import { use, useState, useEffect, useContext, useRef } from "react";
 import Footer from "../footer/footer";
 const TheMost = () => {
+  const [theMostTitles, setTheMostTitles] = useState([]);
   const [highways, setHighways] = useState([]);
   const { title, setTitle } = useContext(TitleContext);
+  const timeoutRef = useRef(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [hoveredHighway, setHoveredHighway] = useState(null);
+  const [groupedHighways, setGroupedHighways] = useState({});
   useEffect(() => {
     const fetchHighways = async () => {
-      console.log("Fetching highways..."); // 確認開始進行請求
-
       setLoading(true); // 確保進入 loading 狀態
       await new Promise((r) => setTimeout(r, 3000)); // 模擬網路延遲
-      console.log("Simulated delay complete."); // 確認延遲結束
-
       try {
+        // Fetch highways data
         const response = await fetch("http://localhost:8000/highways"); // 替换为你的 API 地址
-        console.log("Response received:", response); // 確認收到回應
         if (!response.ok) throw new Error("Failed to fetch highways data");
         const data = await response.json();
-        console.log("Fetched data:", data); // 確認數據內容
-        setHighways(data);
+        const theMostRes = await fetch(
+          "http://localhost:8000/title_of_theMost"
+        );
+        const theMostData = await theMostRes.json();
+
+        // Fetch images & descriptions
+        const [imagesRes, descRes] = await Promise.all([
+          fetch("/db_image.json"),
+          fetch("/db_description.json"),
+        ]);
+
+        if (!imagesRes.ok || !descRes.ok || !theMostRes.ok)
+          throw new Error("Failed to fetch additional data");
+
+        const [imagesData, descriptionsData] = await Promise.all([
+          imagesRes.json(),
+          descRes.json(),
+        ]);
+
+        // 依序獲取每條公路的詳細資料
+        const detailedHighways = await Promise.all(
+          data.map(async (highway) => {
+            try {
+              const highwayId = highway.id;
+
+              // 合併圖片和描述資料
+              highway.images = imagesData[highwayId] || []; // 取得圖片
+              highway.description = descriptionsData[highwayId] || ""; // 取得描述
+              highway.currentImageIndex = 0; // 初始顯示的圖片索引
+
+              return highway; // 返回合併後的資料
+            } catch (error) {
+              return { ...highway, image: [], description: "" }; // 若請求失敗，避免崩潰
+            }
+          })
+        );
+        // 依序獲取theMost標題
+        const detailedtheMost = await Promise.all(
+          theMostData.map(async (highway) => {
+            //這裡看一下
+            try {
+              const theMostTitleId = highway.id;
+
+              // 合併圖片和描述資料
+              highway.title = theMostData[theMostTitleId] || []; // 取得標題
+              return highway; // 返回合併後的資料
+            } catch (error) {
+              return { ...highway, title: "" }; // 若請求失敗，避免崩潰
+            }
+          })
+        );
+
+        // 按照 prefix 分組
+        const grouped = detailedtheMost.reduce((acc, highway) => {
+          const prefix = highway.prefix || "其他";
+          acc[prefix] = acc[prefix] || [];
+          acc[prefix].push(highway);
+          return acc;
+        }, {});
+
+        setTheMostTitles(detailedtheMost);
+        setGroupedHighways(grouped);
         setLoading(false);
       } catch (error) {
-        console.log("Error occurred:", error.message); // 捕獲錯誤並打印
         setError(error.message);
+        setLoading(false);
       }
     };
 
     fetchHighways();
   }, []);
+  const sectionp = theMostTitles.filter(
+    //省道
+    (highway) => highway.id >= 2001 && highway.id < 2022
+  );
+  const sectionc = theMostTitles.filter(
+    //縣市道
+    (highway) => highway.id >= 2022 && highway.id < 2032
+  );
+  console.log(sectionp);
+  const groupByPrefix = (highways) => {
+    return highways.reduce((acc, highway) => {
+      const prefix = highway.prefix || "其他";
+      acc[prefix] = acc[prefix] || [];
+      acc[prefix].push(highway);
+      return acc;
+    }, {});
+  };
+  const renderGroupedHighways = (highways) => {
+    const grouped = groupByPrefix(highways);
 
-  const handleToListClick = () => {
-    window.location.href = "/highways";
+    return Object.entries(grouped).map(([prefix, groupedList]) => (
+      <div key={prefix} className="mb-6">
+        <h3 className="text-xl font-semibold text-gray-300 mb-2">{prefix}</h3>
+        <div className="flex flex-wrap gap-4">
+          {groupedList.map((highway) => (
+            <h3 key={highway.id} className="bg-white rounded p-2 shadow">
+              {highway.title}
+            </h3>
+            // 這裡未來可替換成 <HighwayCard /> 之類的元件
+          ))}
+        </div>
+      </div>
+    ));
   };
-  const handleToHomeClick = () => {
-    window.location.href = "/";
-  };
+
+  // 點擊其他地方時關閉字卡
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        !event.target.closest(".highway-card") &&
+        !event.target.closest(".highway-link")
+      ) {
+        setHoveredHighway(null);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
   return loading ? (
     <>
       <Loading />
@@ -55,19 +158,29 @@ const TheMost = () => {
         <h1 className="text-4xl font-bold text-white-800 text-center my-8">
           公路之最
         </h1>
-        <div className="container mx-auto mt-4 flex flex-row place-content-center">
-          <button
-            onClick={handleToHomeClick}
-            className="text-lg m-4 bg-green-500 text-white hover:text-yellow-300 active:text-yellow-600 p-4 rounded hover:bg-green-600 active:bg-green-800 active:shadow-green-400 active:shadow-md flex flex-row"
-          >
-            <span>首頁</span>
-          </button>
-          <button
-            onClick={handleToListClick}
-            className="text-lg m-4 bg-green-500 text-white hover:text-yellow-300 active:text-yellow-600 p-4 rounded hover:bg-green-600 active:bg-green-800 active:shadow-green-400 active:shadow-md flex flex-row"
-          >
-            <span>公路列表</span>
-          </button>
+        <div className="pl-5">
+          <section className="route-info bg-black-100 p-6 rounded-lg mt-8">
+            <h2 className="text-3xl font-semibold mb-4">省道</h2>
+            {sectionp.length > 0 ? (
+              <div className="space-y-4 ml-4">
+                {renderGroupedHighways(sectionp)}
+              </div>
+            ) : (
+              <p className="text-gray-500">No highways found in this range.</p>
+            )}
+          </section>
+        </div>
+        <div className="pl-5">
+          <section className="route-info bg-black-100 p-6 rounded-lg mt-8">
+            <h2 className="text-3xl font-semibold mb-4">縣市道</h2>
+            {sectionc.length > 0 ? (
+              <div className="space-y-4 ml-4">
+                {renderGroupedHighways(sectionc)}
+              </div>
+            ) : (
+              <p className="text-gray-500">No highways found in this range.</p>
+            )}
+          </section>
         </div>
 
         <div className="pl-5">

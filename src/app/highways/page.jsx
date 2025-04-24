@@ -17,8 +17,6 @@ const HighwayList = () => {
   const [hoveredHighway, setHoveredHighway] = useState(null);
   const [groupedHighways, setGroupedHighways] = useState({});
   const [touchTimeout, setTouchTimeout] = useState(null);
-  const [isCardVisible, setIsCardVisible] = useState(false); // 用來控制顯示字卡的狀態
-  const mutexRef = useRef(Promise.resolve());
 
   useEffect(() => {
     const fetchHighways = async () => {
@@ -81,18 +79,6 @@ const HighwayList = () => {
 
     fetchHighways();
   }, []);
-  async function changeHighwayCard(value) {
-    mutexRef.current = mutexRef.current
-      .then(async () => {
-        console.log(`starting change card`);
-        setHoveredHighway(value);
-        console.log(`card already changed`);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-    return mutexRef.current;
-  }
 
   // 點擊其他地方時關閉字卡
   useEffect(() => {
@@ -101,20 +87,13 @@ const HighwayList = () => {
         !event.target.closest(".highway-card") &&
         !event.target.closest(".highway-link")
       ) {
-        changeHighwayCard(null);
+        setHoveredHighway(null);
       }
     };
 
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
-
-  const handleToHomeClick = () => {
-    window.location.href = "/";
-  };
-  const handleToTheMostClick = () => {
-    window.location.href = "/themost";
-  };
 
   return loading ? (
     <>
@@ -130,20 +109,6 @@ const HighwayList = () => {
         <h1 className="text-4xl font-bold text-white-800 text-center my-8">
           公路列表
         </h1>
-        <div className="container mx-auto mt-4 flex flex-row place-content-center">
-          <button
-            onClick={handleToHomeClick}
-            className="text-lg m-4 bg-green-500 text-white hover:text-yellow-300 active:text-yellow-600 p-4 rounded hover:bg-green-600 active:bg-green-800 active:shadow-green-400 active:shadow-md flex flex-row"
-          >
-            <span>首頁</span>
-          </button>
-          <button
-            onClick={handleToTheMostClick}
-            className="text-lg m-4 bg-green-500 text-white hover:text-yellow-300 active:text-yellow-600 p-4 rounded hover:bg-green-600 active:bg-green-800 active:shadow-green-400 active:shadow-md flex flex-row"
-          >
-            <span>公路之最</span>
-          </button>
-        </div>
 
         <div className=" pl-1 md:pl-3 lg:pl-5">
           <Province
@@ -155,7 +120,6 @@ const HighwayList = () => {
             setLoading={setLoading}
             error={error}
             setError={setError}
-            changeHighwayCard={changeHighwayCard}
           />
           <County
             hoveredHighway={hoveredHighway}
@@ -166,7 +130,6 @@ const HighwayList = () => {
             setLoading={setLoading}
             error={error}
             setError={setError}
-            changeHighwayCard={changeHighwayCard}
           />
         </div>
       </div>

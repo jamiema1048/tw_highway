@@ -10,14 +10,9 @@ const County = ({
   setLoading,
   error,
   setError,
-  changeHighwayCard,
 }) => {
-  //const [highways, setHighways] = useState([]);
   const timeoutRef = useRef(null);
-  //const [error, setError] = useState(null);
-  //const [loading, setLoading] = useState(true);
   const [isCountyShow, setIsCountyShow] = useState(false);
-  //const [hoveredHighway, setHoveredHighway] = useState(null);
   const [groupedHighways, setGroupedHighways] = useState({});
   const [isCountyShowCXX, setIsCountyShowCXX] = useState(false); //101~120
   const [isCountyShowCXL, setIsCountyShowCXL] = useState(false); //121~140
@@ -146,7 +141,6 @@ const County = ({
             setLoading={setLoading}
             error={error}
             setError={setError}
-            changeHighwayCard={changeHighwayCard}
           />
         ))}
       </div>
