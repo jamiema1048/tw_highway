@@ -1,7 +1,7 @@
 "use client"; // 確保這個組件在客戶端運行
 
 import { useContext, useState, useEffect } from "react";
-import { TitleContext } from "./../../context/TitleContext";
+import { TitleContext } from "../../context/TitleContext";
 import Head from "next/head";
 import Image from "next/image";
 import NotFound from "./not-found"; // ✅ 引入 not-found 頁面

@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Head from "next/head";
-import { TitleContext } from "./../context/TitleContext";
+import { TitleContext } from "../context/TitleContext";
 import Loading from "./loading";
 import { use, useState, useEffect, useContext, useRef } from "react";
 import Province from "./Province";

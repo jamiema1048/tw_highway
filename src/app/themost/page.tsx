@@ -5,88 +5,93 @@ import { TitleContext } from "../context/TitleContext";
 import Loading from "./loading";
 import { use, useState, useEffect, useContext, useRef } from "react";
 import Footer from "../footer/footer";
-const TheMost = () => {
-  const [theMostTitles, setTheMostTitles] = useState([]);
-  const [highways, setHighways] = useState([]);
+
+// 定義 Highway 資料型別
+interface Highway {
+  id: number;
+  name?: string;
+  prefix?: string;
+  images?: string[];
+  description?: string;
+  currentImageIndex?: number;
+  title?: string;
+}
+
+// 定義分組資料型別
+type GroupedHighways = Record<string, Highway[]>;
+
+const TheMost = (): JSX.Element => {
+  const [theMostTitles, setTheMostTitles] = useState<Highway[]>([]);
+  const [highways, setHighways] = useState<Highway[]>([]);
   const { title, setTitle } = useContext(TitleContext);
-  const timeoutRef = useRef(null);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [hoveredHighway, setHoveredHighway] = useState(null);
-  const [groupedHighways, setGroupedHighways] = useState({});
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [hoveredHighway, setHoveredHighway] = useState<Highway | null>(null);
+  const [groupedHighways, setGroupedHighways] = useState<GroupedHighways>({});
+
   useEffect(() => {
     const fetchHighways = async () => {
-      setLoading(true); // 確保進入 loading 狀態
-      await new Promise((r) => setTimeout(r, 3000)); // 模擬網路延遲
+      setLoading(true);
+      await new Promise((r) => setTimeout(r, 3000)); // 模擬延遲
+
       try {
-        // Fetch highways data
-        const response = await fetch("http://localhost:8000/highways"); // 替换为你的 API 地址
+        const response = await fetch("http://localhost:8000/highways");
         if (!response.ok) throw new Error("Failed to fetch highways data");
-        const data = await response.json();
+        const data: Highway[] = await response.json();
+
         const theMostRes = await fetch(
           "http://localhost:8000/title_of_theMost"
         );
-        const theMostData = await theMostRes.json();
+        if (!theMostRes.ok) throw new Error("Failed to fetch theMost data");
+        const theMostData: Highway[] = await theMostRes.json();
 
-        // Fetch images & descriptions
         const [imagesRes, descRes] = await Promise.all([
           fetch("/db_image.json"),
           fetch("/db_description.json"),
         ]);
-
-        if (!imagesRes.ok || !descRes.ok || !theMostRes.ok)
+        if (!imagesRes.ok || !descRes.ok)
           throw new Error("Failed to fetch additional data");
 
-        const [imagesData, descriptionsData] = await Promise.all([
-          imagesRes.json(),
-          descRes.json(),
-        ]);
+        const imagesData: Record<number, string[]> = await imagesRes.json();
+        const descriptionsData: Record<number, string> = await descRes.json();
 
-        // 依序獲取每條公路的詳細資料
         const detailedHighways = await Promise.all(
           data.map(async (highway) => {
-            try {
-              const highwayId = highway.id;
-
-              // 合併圖片和描述資料
-              highway.images = imagesData[highwayId] || []; // 取得圖片
-              highway.description = descriptionsData[highwayId] || ""; // 取得描述
-              highway.currentImageIndex = 0; // 初始顯示的圖片索引
-
-              return highway; // 返回合併後的資料
-            } catch (error) {
-              return { ...highway, image: [], description: "" }; // 若請求失敗，避免崩潰
-            }
+            const highwayId = highway.id;
+            return {
+              ...highway,
+              images: imagesData[highwayId] || [],
+              description: descriptionsData[highwayId] || "",
+              currentImageIndex: 0,
+            };
           })
         );
-        // 依序獲取theMost標題
-        const detailedtheMost = await Promise.all(
+
+        const detailedTheMost = await Promise.all(
           theMostData.map(async (highway) => {
-            //這裡看一下
-            try {
-              const theMostTitleId = highway.id;
-
-              // 合併圖片和描述資料
-              highway.title = theMostData[theMostTitleId] || []; // 取得標題
-              return highway; // 返回合併後的資料
-            } catch (error) {
-              return { ...highway, title: "" }; // 若請求失敗，避免崩潰
-            }
+            const id = highway.id;
+            return {
+              ...highway,
+              title: theMostData.find((h) => h.id === id)?.title || "",
+            };
           })
         );
 
-        // 按照 prefix 分組
-        const grouped = detailedtheMost.reduce((acc, highway) => {
-          const prefix = highway.prefix || "其他";
-          acc[prefix] = acc[prefix] || [];
-          acc[prefix].push(highway);
-          return acc;
-        }, {});
+        const grouped: GroupedHighways = detailedTheMost.reduce(
+          (acc, highway) => {
+            const prefix = highway.prefix || "其他";
+            acc[prefix] = acc[prefix] || [];
+            acc[prefix].push(highway);
+            return acc;
+          },
+          {} as GroupedHighways
+        );
 
-        setTheMostTitles(detailedtheMost);
+        setTheMostTitles(detailedTheMost);
         setGroupedHighways(grouped);
         setLoading(false);
-      } catch (error) {
+      } catch (error: any) {
         setError(error.message);
         setLoading(false);
       }
@@ -94,24 +99,19 @@ const TheMost = () => {
 
     fetchHighways();
   }, []);
-  const sectionp = theMostTitles.filter(
-    //省道
-    (highway) => highway.id >= 2001 && highway.id < 2022
-  );
-  const sectionc = theMostTitles.filter(
-    //縣市道
-    (highway) => highway.id >= 2022 && highway.id < 2032
-  );
-  console.log(sectionp);
-  const groupByPrefix = (highways) => {
-    return highways.reduce((acc, highway) => {
+
+  const sectionp = theMostTitles.filter((h) => h.id >= 2001 && h.id < 2022);
+  const sectionc = theMostTitles.filter((h) => h.id >= 2022 && h.id < 2032);
+
+  const groupByPrefix = (highways: Highway[]): GroupedHighways => {
+    return highways.reduce((acc: GroupedHighways, highway) => {
       const prefix = highway.prefix || "其他";
       acc[prefix] = acc[prefix] || [];
       acc[prefix].push(highway);
       return acc;
     }, {});
   };
-  const renderGroupedHighways = (highways) => {
+  const renderGroupedHighways = (highways: Highway[]) => {
     const grouped = groupByPrefix(highways);
 
     return Object.entries(grouped).map(([prefix, groupedList]) => (

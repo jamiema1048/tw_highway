@@ -1,0 +1,1 @@
+json-server eslint postcss tailwindcss vitest @testing-library/react @testing-library/jest-dom msw @vitejs/plugin-react vite-plugin-magical-svg @testing-library/user-event typescript @types/react @types/node tailwindcss-language-server ts-node typescript @types/node
