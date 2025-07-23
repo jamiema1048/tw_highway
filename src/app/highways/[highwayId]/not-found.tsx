@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import Head from "next/head";
-const NotFound = () => {
+const NotFound = (): JSX.Element => {
   const handleToListClick = () => {
     window.location.href = "/highways";
   };

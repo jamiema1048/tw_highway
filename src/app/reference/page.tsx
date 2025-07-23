@@ -1,21 +1,26 @@
 "use client";
+
 import Link from "next/link";
 import Head from "next/head";
+import { useState, useContext, useEffect } from "react";
 import { TitleContext } from "../context/TitleContext";
-//import Loading from "./loading";
-import { use, useState, useEffect, useContext } from "react";
 import Footer from "../footer/footer";
-const DataReference = () => {
+
+const DataReference = (): JSX.Element => {
   const { title, setTitle } = useContext(TitleContext);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
   const handleToListClick = () => {
     window.location.href = "/highways";
   };
+
   const handleToHomeClick = () => {
     window.location.href = "/";
   };
+
   console.log("DataReference is rendering...");
+
   return (
     <>
       <Head>
@@ -25,6 +30,7 @@ const DataReference = () => {
         <h1 className="text-4xl font-bold text-white-800 text-center my-8">
           參考資料
         </h1>
+
         <div className="container mx-auto mt-4 flex flex-row place-content-center">
           <button
             onClick={handleToHomeClick}
@@ -44,9 +50,9 @@ const DataReference = () => {
           <section className="route-info bg-black-100 p-6 rounded-lg mt-8">
             <h2 className="text-3xl font-semibold mb-4">資料來源</h2>
             <h3 className="text-xl mb-4">
-              <strong>1. </strong>{" "}
+              <strong>1. </strong>
               <Link
-                href={"https://twroad.org/"}
+                href="https://twroad.org/"
                 className="font-bold text-white-600 hover:text-yellow-400 active:text-yellow-600 cursor-pointer"
               >
                 公路邦
@@ -62,4 +68,5 @@ const DataReference = () => {
     </>
   );
 };
+
 export default DataReference;

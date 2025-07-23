@@ -2,8 +2,9 @@
 import React from "react";
 import { usePathname } from "next/navigation";
 
-const Footer = () => {
+const Footer: React.FC = () => {
   const pathname = usePathname(); // 取得當前路徑
+
   const handleToListClick = () => {
     window.location.href = "/highways";
   };
@@ -16,6 +17,7 @@ const Footer = () => {
   const handleToHomeClick = () => {
     window.location.href = "/";
   };
+
   return (
     <footer className="flex flex-col gap-6 flex-wrap items-center justify-center">
       <div className="flex gap-4 items-center flex-col sm:flex-row">

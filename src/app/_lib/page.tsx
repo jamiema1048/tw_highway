@@ -1,4 +1,6 @@
-const PrivateRoute = () => {
+import React from "react";
+
+const PrivateRoute: React.FC = () => {
   return (
     <div>
       <h1>You cannot view this in the browser</h1>
@@ -14,26 +16,18 @@ const PrivateRoute = () => {
             <td>name</td>
             <td>公路編號</td>
           </tr>
-        </tbody>
-        <tbody>
           <tr>
             <td>start</td>
             <td>起點</td>
           </tr>
-        </tbody>
-        <tbody>
           <tr>
             <td>end</td>
             <td>終點</td>
           </tr>
-        </tbody>
-        <tbody>
           <tr>
             <td>length</td>
             <td>長度</td>
           </tr>
-        </tbody>
-        <tbody>
           <tr>
             <td>otherName</td>
             <td>別稱</td>
@@ -43,10 +37,11 @@ const PrivateRoute = () => {
     </div>
   );
 };
-//國道5號=>id:30500
-//台8線=>id:40800
-//縣道122號=>id:12200
-//台9丁線=>id:40904
-//縣道114甲號=>id:11401
+
+// 國道5號 => id: 30500
+// 台8線   => id: 40800
+// 縣道122號 => id: 12200
+// 台9丁線 => id: 40904
+// 縣道114甲號 => id: 11401
 
 export default PrivateRoute;

@@ -3,32 +3,51 @@ import Link from "next/link";
 import Head from "next/head";
 import { TitleContext } from "../context/TitleContext";
 import Loading from "./loading";
-import { use, useState, useEffect, useContext, useRef } from "react";
+import {
+  use,
+  useState,
+  useEffect,
+  useContext,
+  useRef,
+  MouseEvent,
+} from "react";
 import Province from "./Province";
 import County from "./County";
 import Footer from "../footer/footer";
 
+type Highway = {
+  id: string;
+  name: string;
+  prefix?: string;
+  images?: string[];
+  description?: string;
+  currentImageIndex?: number;
+  [key: string]: any; // 允許其他屬性存在
+};
+
+type GroupedHighways = {
+  [prefix: string]: Highway[];
+};
+
 const HighwayList = () => {
-  const [highways, setHighways] = useState([]);
+  const [highways, setHighways] = useState<Highway[]>([]);
   const { title, setTitle } = useContext(TitleContext);
-  const timeoutRef = useRef(null);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [hoveredHighway, setHoveredHighway] = useState(null);
-  const [groupedHighways, setGroupedHighways] = useState({});
-  const [touchTimeout, setTouchTimeout] = useState(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [hoveredHighway, setHoveredHighway] = useState<Highway | null>(null);
+  const [groupedHighways, setGroupedHighways] = useState<GroupedHighways>({});
+  const [touchTimeout, setTouchTimeout] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const fetchHighways = async () => {
-      setLoading(true); // 確保進入 loading 狀態
-      await new Promise((r) => setTimeout(r, 3000)); // 模擬網路延遲
+      setLoading(true);
+      await new Promise((r) => setTimeout(r, 3000));
       try {
-        // Fetch highways data
-        const response = await fetch("http://localhost:8000/highways"); // 替换为你的 API 地址
+        const response = await fetch("http://localhost:8000/highways");
         if (!response.ok) throw new Error("Failed to fetch highways data");
-        const data = await response.json();
+        const data: Highway[] = await response.json();
 
-        // Fetch images & descriptions
         const [imagesRes, descRes] = await Promise.all([
           fetch("/db_image.json"),
           fetch("/db_description.json"),
@@ -37,42 +56,37 @@ const HighwayList = () => {
         if (!imagesRes.ok || !descRes.ok)
           throw new Error("Failed to fetch additional data");
 
-        const [imagesData, descriptionsData] = await Promise.all([
-          imagesRes.json(),
-          descRes.json(),
-        ]);
+        const imagesData: { [key: string]: string[] } = await imagesRes.json();
+        const descriptionsData: { [key: string]: string } =
+          await descRes.json();
 
-        // 依序獲取每條公路的詳細資料
         const detailedHighways = await Promise.all(
           data.map(async (highway) => {
-            try {
-              const highwayId = highway.id;
-
-              // 合併圖片和描述資料
-              highway.images = imagesData[highwayId] || []; // 取得圖片
-              highway.description = descriptionsData[highwayId] || ""; // 取得描述
-              highway.currentImageIndex = 0; // 初始顯示的圖片索引
-
-              return highway; // 返回合併後的資料
-            } catch (error) {
-              return { ...highway, image: [], description: "" }; // 若請求失敗，避免崩潰
-            }
+            const highwayId = highway.id;
+            return {
+              ...highway,
+              images: imagesData[highwayId] || [],
+              description: descriptionsData[highwayId] || "",
+              currentImageIndex: 0,
+            };
           })
         );
 
-        // 按照 prefix 分組
-        const grouped = detailedHighways.reduce((acc, highway) => {
-          const prefix = highway.prefix || "其他";
-          acc[prefix] = acc[prefix] || [];
-          acc[prefix].push(highway);
-          return acc;
-        }, {});
+        const grouped = detailedHighways.reduce(
+          (acc: GroupedHighways, highway) => {
+            const prefix = highway.prefix || "其他";
+            acc[prefix] = acc[prefix] || [];
+            acc[prefix].push(highway);
+            return acc;
+          },
+          {}
+        );
 
         setHighways(detailedHighways);
         setGroupedHighways(grouped);
         setLoading(false);
-      } catch (error) {
-        setError(error.message);
+      } catch (error: any) {
+        setError(error.message || "發生錯誤");
         setLoading(false);
       }
     };
@@ -80,9 +94,8 @@ const HighwayList = () => {
     fetchHighways();
   }, []);
 
-  // 點擊其他地方時關閉字卡
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = (event: MouseEvent | any) => {
       if (
         !event.target.closest(".highway-card") &&
         !event.target.closest(".highway-link")
@@ -110,7 +123,7 @@ const HighwayList = () => {
           公路列表
         </h1>
 
-        <div className=" pl-1 md:pl-3 lg:pl-5">
+        <div className="pl-1 md:pl-3 lg:pl-5">
           <Province
             hoveredHighway={hoveredHighway}
             setHoveredHighway={setHoveredHighway}

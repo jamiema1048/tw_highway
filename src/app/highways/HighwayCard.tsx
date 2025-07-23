@@ -1,5 +1,16 @@
-import { useState, useRef } from "react";
+import { useState, useRef, MouseEvent, TouchEvent } from "react";
 import Link from "next/link";
+import { Highway } from "types/highway";
+
+type HighwayCardProps = {
+  highway: Highway;
+  hoveredHighway: Highway | null;
+  setHoveredHighway: React.Dispatch<React.SetStateAction<Highway | null>>;
+  loading: boolean;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  error: string | null;
+  setError: React.Dispatch<React.SetStateAction<string | null>>;
+};
 
 const HighwayCard = ({
   highway,
@@ -9,87 +20,78 @@ const HighwayCard = ({
   setLoading,
   error,
   setError,
-}) => {
-  const timeoutRef = useRef(null);
-  let mutex = Promise.resolve();
+}: HighwayCardProps): JSX.Element => {
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [touchTimeout, setTouchTimeout] = useState<NodeJS.Timeout | null>(null);
 
-  // 處理手機長按
-  const handleTouchStart = (highway) => {
+  const handleTouchStart = (highway: Highway) => {
     if (touchTimeout) clearTimeout(touchTimeout);
     const timeout = setTimeout(() => {
       setHoveredHighway(highway);
-    }, 500); // 0.5秒後才觸發，避免短按立即觸發
+    }, 500);
     setTouchTimeout(timeout);
   };
 
-  // 取消長按事件（短按無效）
   const handleTouchEnd = () => {
     if (touchTimeout) clearTimeout(touchTimeout);
   };
 
-  // 這部分可以忽略，專注於字卡和圖片切換邏輯
   const handleNextImage = () => {
     if (
       hoveredHighway &&
       hoveredHighway.images &&
-      hoveredHighway.currentImageIndex < hoveredHighway.images.length - 1
+      hoveredHighway.currentImageIndex! < hoveredHighway.images.length - 1
     ) {
-      setHoveredHighway((prev) => ({
-        ...prev,
-        currentImageIndex: prev.currentImageIndex + 1,
-      }));
+      setHoveredHighway((prev) =>
+        prev
+          ? {
+              ...prev,
+              currentImageIndex: (prev.currentImageIndex || 0) + 1,
+            }
+          : null
+      );
     }
   };
 
   const handlePrevImage = () => {
-    if (hoveredHighway && hoveredHighway.currentImageIndex > 0) {
-      setHoveredHighway((prev) => ({
-        ...prev,
-        currentImageIndex: prev.currentImageIndex - 1,
-      }));
+    if (hoveredHighway && (hoveredHighway.currentImageIndex || 0) > 0) {
+      setHoveredHighway((prev) =>
+        prev
+          ? {
+              ...prev,
+              currentImageIndex: (prev.currentImageIndex || 0) - 1,
+            }
+          : null
+      );
     }
   };
+
   const handleMouseEnter = () => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-    // async function writeCard() {
-    //   // 只有當 hoveredHighway 不同時才更新狀態，避免不必要的重渲染
-    //   if (!hoveredHighway || hoveredHighway.id !== highway.id) {
-    //     await Promise.all([setHoveredHighway(highway)]);
-    //   }
-    // }
-    // writeCard();
     timeoutRef.current = setTimeout(() => {
-      // 只有當 hoveredHighway 不同時才更新狀態，避免不必要的重渲染
       if (!hoveredHighway || hoveredHighway.id !== highway.id) {
         setHoveredHighway(highway);
       }
     }, 300);
   };
 
-  const handleMouseLeave = (event) => {
+  const handleMouseLeave = (event: MouseEvent<HTMLAnchorElement>) => {
     timeoutRef.current = setTimeout(() => {
-      // 如果滑鼠進入其他 Link，則不關閉字卡
-      const relatedTarget = event.relatedTarget;
+      const relatedTarget = event.relatedTarget as HTMLElement | null;
       if (
         relatedTarget &&
         (relatedTarget.closest("a") || relatedTarget.closest(".highway-card"))
       ) {
         return;
       }
-
-      async function clearCard() {
-        await Promise.all([setHoveredHighway(null)]);
-      }
-      clearCard();
+      setHoveredHighway(null);
     }, 300);
   };
 
   const handleCardMouseEnter = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
   };
 
   const handleCardMouseLeave = () => {
@@ -102,15 +104,15 @@ const HighwayCard = ({
     <h3 className="relative text-xl">
       <Link
         href={`highways/${highway.id}`}
-        className="font-bold text-white-600 hover:text-yellow-400 active:text-yellow-600"
+        className="font-bold text-white-600 hover:text-yellow-400 active:text-yellow-600 highway-link"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        onTouchStart={handleTouchStart}
+        onTouchStart={() => handleTouchStart(highway)}
         onTouchEnd={handleTouchEnd}
       >
-        {highway.remark && highway.remark.includes("解編")
+        {highway.remark?.includes("解編")
           ? `${highway.name}  (已解編)`
-          : highway.remark && highway.remark.includes("未納編")
+          : highway.remark?.includes("未納編")
           ? `${highway.name}  (未納編)`
           : highway.name}
       </Link>
@@ -121,39 +123,40 @@ const HighwayCard = ({
           onMouseEnter={handleCardMouseEnter}
           onMouseLeave={handleCardMouseLeave}
         >
-          {/* 如果有多張圖片 */}
+          {/* 多張圖片 */}
           {hoveredHighway.images && hoveredHighway.images.length > 1 ? (
             <div className="relative">
-              {/* 顯示圖片 */}
               <img
-                src={hoveredHighway.images[hoveredHighway.currentImageIndex]}
+                src={
+                  hoveredHighway.images[hoveredHighway.currentImageIndex || 0]
+                }
                 alt={hoveredHighway.name}
                 className="w-full h-48 object-cover rounded-md"
-                style={{ objectPosition: "center" }} // 設置圖片顯示中間部分
+                style={{ objectPosition: "center" }}
               />
 
-              {/* 只有當圖片索引大於0時，顯示上一張按鈕 */}
               <button
                 className={`absolute top-1/2 left-0 transform ${
-                  hoveredHighway.currentImageIndex > 0 ? "block" : "hidden"
+                  (hoveredHighway.currentImageIndex || 0) > 0
+                    ? "block"
+                    : "hidden"
                 } -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full z-10`}
                 onClick={handlePrevImage}
-                disabled={hoveredHighway.currentImageIndex <= 0}
+                disabled={(hoveredHighway.currentImageIndex || 0) <= 0}
               >
                 ◀
               </button>
 
-              {/* 只有當圖片索引小於圖片數量減一時，顯示下一張按鈕 */}
               <button
                 className={`absolute top-1/2 right-0 transform ${
-                  hoveredHighway.currentImageIndex <
+                  (hoveredHighway.currentImageIndex || 0) <
                   hoveredHighway.images.length - 1
                     ? "block"
                     : "hidden"
                 } -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full z-10`}
                 onClick={handleNextImage}
                 disabled={
-                  hoveredHighway.currentImageIndex >=
+                  (hoveredHighway.currentImageIndex || 0) >=
                   hoveredHighway.images.length - 1
                 }
               >
@@ -161,7 +164,6 @@ const HighwayCard = ({
               </button>
             </div>
           ) : hoveredHighway.images && hoveredHighway.images.length === 1 ? (
-            // 單張圖片顯示
             <div className="w-full h-48 flex items-center justify-center bg-gray-200 rounded-md">
               <img
                 src={hoveredHighway.images[0]}
@@ -170,19 +172,18 @@ const HighwayCard = ({
               />
             </div>
           ) : (
-            // 無圖片顯示
             <div className="w-full h-48 flex items-center justify-center bg-gray-200 rounded-md">
               <span className="text-gray-500">No image to show</span>
             </div>
           )}
-          {hoveredHighway.images && hoveredHighway.images.length > 0 ? (
+
+          {hoveredHighway.images?.length ? (
             <p className="text-sm text-black font-semibold mt-2">
-              {hoveredHighway.currentImageIndex + 1}/
+              {(hoveredHighway.currentImageIndex || 0) + 1}/
               {hoveredHighway.images.length}
             </p>
-          ) : (
-            <></>
-          )}
+          ) : null}
+
           <p className="text-sm text-black font-semibold mt-2">
             {highway.name}
           </p>

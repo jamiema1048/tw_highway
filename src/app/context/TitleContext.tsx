@@ -1,35 +1,54 @@
 "use client";
-import { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, ReactNode } from "react";
 import { usePathname } from "next/navigation";
 
-export const TitleContext = createContext();
+// 定義 Context 的型別
+interface TitleContextType {
+  title: string;
+  setTitle: React.Dispatch<React.SetStateAction<string>>;
+}
 
-export const TitleProvider = ({ children }) => {
-  const pathname = usePathname(); // 取得當前路徑
-  const [title, setTitle] = useState(() => {
-    if (pathname == "/") {
-      return "首頁";
-    } else if (pathname == "/highways") {
-      return "公路列表";
-    } else if (pathname == "/themost") {
-      return "公路之最";
-    } else if (pathname == "/reference") {
-      return "參考資料";
+// 提供預設值，TS 需要初始型別對應
+export const TitleContext = createContext<TitleContextType>({
+  title: "首頁",
+  setTitle: () => {},
+});
+
+// 定義 props 型別
+interface TitleProviderProps {
+  children: ReactNode;
+}
+
+export const TitleProvider: React.FC<TitleProviderProps> = ({ children }) => {
+  const pathname = usePathname();
+  const [title, setTitle] = useState<string>(() => {
+    switch (pathname) {
+      case "/highways":
+        return "公路列表";
+      case "/themost":
+        return "公路之最";
+      case "/reference":
+        return "參考資料";
+      default:
+        return "首頁";
     }
   });
 
   useEffect(() => {
-    console.log("Current Path:", pathname); // 確保 pathname 正常更新
     let newTitle = "首頁";
-    if (pathname === "/highways") {
-      newTitle = "公路列表";
-    } else if (pathname === "/themost") {
-      newTitle = "公路之最";
-    } else if (pathname === "/reference") {
-      newTitle = "參考資料";
+    switch (pathname) {
+      case "/highways":
+        newTitle = "公路列表";
+        break;
+      case "/themost":
+        newTitle = "公路之最";
+        break;
+      case "/reference":
+        newTitle = "參考資料";
+        break;
     }
     setTitle(newTitle);
-    document.title = newTitle; // 立即更新標題
+    document.title = newTitle;
   }, [pathname]);
 
   return (

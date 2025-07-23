@@ -4,7 +4,6 @@ import { render, screen } from "@testing-library/react";
 import Home from "@/app/page";
 import { TitleProvider } from "@/app/context/TitleContext"; // 確保引入 TitleProvider
 
-// 測試 Home 組件
 describe("Home", () => {
   it("renders the Home component", () => {
     render(
@@ -13,19 +12,17 @@ describe("Home", () => {
       </TitleProvider>
     );
 
-    screen.debug(); // prints out the JSX in the Home component to the command line
+    screen.debug(); // 輸出組件的 DOM 結構到控制台
   });
 });
 
 describe("Mock example", () => {
   it("calls the mock function", () => {
-    const mockFn = vi.fn(() => "Hello"); // 創建一個模擬函數，回傳 'Hello'
+    const mockFn: () => string = vi.fn(() => "Hello"); // 指定返回字串的型別
 
-    // 調用 mock 函數
-    expect(mockFn()).toBe("Hello"); // 測試回傳值是否為 'Hello'
+    expect(mockFn()).toBe("Hello");
     expect(mockFn()).not.toBe("Go away");
 
-    // 驗證 mock 函數是否被呼叫過
-    expect(mockFn).toHaveBeenCalled();
+    expect(mockFn).toHaveBeenCalled(); // 確保函數被呼叫
   });
 });

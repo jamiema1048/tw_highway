@@ -1,8 +1,12 @@
 "use client";
-import { useState, useEffect } from "react";
+import { ReactNode } from "react";
 
-const highwayContentLayout = ({ children }) => {
+interface HighwayContentLayoutProps {
+  children: ReactNode;
+}
+
+const HighwayContentLayout = ({ children }: HighwayContentLayoutProps) => {
   return <>{children}</>;
 };
 
-export default highwayContentLayout;
+export default HighwayContentLayout;
