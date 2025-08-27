@@ -1,155 +1,70 @@
+// src/app/highways/Province.tsx
 "use client";
 
-import React, { useState, useEffect, useRef, useContext } from "react";
+import { useState } from "react";
 import HighwayCard from "./HighwayCard";
 import { Highway } from "types/highway";
 
-interface ProvinceProps {
+interface Props {
   highways: Highway[];
-  setHighways: React.Dispatch<React.SetStateAction<Highway[]>>;
   hoveredHighway: Highway | null;
-  setHoveredHighway: React.Dispatch<React.SetStateAction<Highway | null>>;
+  setHoveredHighway: (hwy: Highway | null) => void;
   loading: boolean;
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  error: string | null;
-  setError: React.Dispatch<React.SetStateAction<string | null>>;
+  setLoading: (val: boolean) => void;
 }
 
-const Province: React.FC<ProvinceProps> = ({
+export default function Province({
   highways,
-  setHighways,
   hoveredHighway,
   setHoveredHighway,
   loading,
   setLoading,
-  error,
-  setError,
-}) => {
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+}: Props) {
   const [isProvinceShow, setIsProvinceShow] = useState(false);
-  const [groupedHighways, setGroupedHighways] = useState<
-    Record<string, Highway[]>
-  >({});
-  const [isProvinceShowXX, setIsProvinceShowXX] = useState(false); // 1~20
-  const [isProvinceShowC, setIsProvinceShowC] = useState(false); // 21~
+  const [isProvinceShowXX, setIsProvinceShowXX] = useState(false);
+  const [isProvinceShowC, setIsProvinceShowC] = useState(false);
 
-  useEffect(() => {
-    const fetchHighways = async () => {
-      setLoading(true);
-      await new Promise((r) => setTimeout(r, 3000)); // 模擬網路延遲
-      try {
-        const response = await fetch("http://localhost:8000/highways");
-        if (!response.ok) throw new Error("Failed to fetch highways data");
-        const data: Highway[] = await response.json();
-
-        const [imagesRes, descRes] = await Promise.all([
-          fetch("/db_image.json"),
-          fetch("/db_description.json"),
-        ]);
-
-        if (!imagesRes.ok || !descRes.ok)
-          throw new Error("Failed to fetch additional data");
-
-        const [imagesData, descriptionsData]: [
-          Record<number, string[]>,
-          Record<number, string>
-        ] = await Promise.all([imagesRes.json(), descRes.json()]);
-
-        const detailedHighways: Highway[] = await Promise.all(
-          data.map(async (highway) => {
-            const highwayId = highway.id;
-            highway.images = imagesData[highwayId] || [];
-            highway.description = descriptionsData[highwayId] || "";
-            highway.currentImageIndex = 0;
-            return highway;
-          })
-        );
-
-        const grouped = detailedHighways.reduce(
-          (acc: Record<string, Highway[]>, highway) => {
-            const prefix = highway.prefix || "其他";
-            acc[prefix] = acc[prefix] || [];
-            acc[prefix].push(highway);
-            return acc;
-          },
-          {}
-        );
-
-        setHighways(detailedHighways);
-        setGroupedHighways(grouped);
-        setLoading(false);
-      } catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : String(err);
-        setError(errorMessage);
-        setLoading(false);
-      }
-    };
-
-    fetchHighways();
-  }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (
-        !target.closest(".highway-card") &&
-        !target.closest(".highway-link")
-      ) {
-        setHoveredHighway(null);
-      }
-    };
-
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, []);
-
+  // 過濾不同段的 highways
   const section420 = highways.filter(
-    (highway) => highway.id / 100 >= 400 && highway.id / 100 < 421
+    (hwy) => hwy.id / 100 >= 400 && hwy.id / 100 < 421
   );
-
   const section440 = highways.filter(
-    (highway) => highway.id / 100 >= 421 && highway.id / 100 < 500
+    (hwy) => hwy.id / 100 >= 421 && hwy.id / 100 < 500
   );
 
+  // 分組函數
   const groupByPrefix = (section: Highway[]): Record<string, Highway[]> => {
     const grouped: Record<string, Highway[]> = {};
-    section.forEach((highway) => {
-      const prefix = Math.floor(highway.id / 100).toString();
-      if (!grouped[prefix]) {
-        grouped[prefix] = [];
-      }
-      grouped[prefix].push(highway);
+    section.forEach((hwy) => {
+      const prefix = Math.floor(hwy.id / 100).toString();
+      if (!grouped[prefix]) grouped[prefix] = [];
+      grouped[prefix].push(hwy);
     });
     return grouped;
   };
 
-  const renderGroupedHighways = (
-    groupedHighways: Record<string, Highway[]>
-  ) => {
-    return Object.entries(groupedHighways).map(([prefix, highways]) => (
+  const renderGroupedHighways = (section: Highway[]) =>
+    Object.entries(groupByPrefix(section)).map(([prefix, highways]) => (
       <div key={prefix} className="flex flex-wrap gap-4">
-        {highways.map((highway) => (
+        {highways.map((hwy) => (
           <HighwayCard
-            key={highway.id}
-            highway={highway}
+            key={hwy.id}
+            highway={hwy}
             hoveredHighway={hoveredHighway}
             setHoveredHighway={setHoveredHighway}
             loading={loading}
             setLoading={setLoading}
-            error={error}
-            setError={setError}
           />
         ))}
       </div>
     ));
-  };
 
   return (
-    <div className="ml-3 md:ml-6 lg:ml-9 mt-4 h-md:mt-6 h-lg:mt-8">
+    <div className="ml-3 md:ml-6 lg:ml-9 mt-4">
       <h2
         className={`text-4xl font-semibold ${
           isProvinceShow ? "text-yellow-400" : "text-white-600"
-        } active:text-yellow-600 cursor-pointer max-w-fit mb-2 h-md:mb-3 h-lg:mb-4 lg:pr-3`}
+        } cursor-pointer mb-2`}
         onClick={() => setIsProvinceShow((prev) => !prev)}
       >
         省道 {isProvinceShow ? "▲" : "▼"}
@@ -161,23 +76,17 @@ const Province: React.FC<ProvinceProps> = ({
             <h3
               className={`text-2xl ${
                 isProvinceShowXX ? "text-yellow-400" : "text-white-600"
-              } active:text-yellow-600 cursor-pointer font-semibold`}
+              } cursor-pointer font-semibold`}
               onClick={() => setIsProvinceShowXX((prev) => !prev)}
             >
               1~20 {isProvinceShowXX ? "▲" : "▼"}
             </h3>
             {isProvinceShowXX && (
-              <>
-                {section420.length > 0 ? (
-                  <div className="space-y-4 ml-4">
-                    {renderGroupedHighways(groupByPrefix(section420))}
-                  </div>
-                ) : (
-                  <p className="text-gray-500">
-                    No highways found in this range.
-                  </p>
-                )}
-              </>
+              <div className="space-y-4 ml-4">
+                {section420.length > 0
+                  ? renderGroupedHighways(section420)
+                  : "No highways found"}
+              </div>
             )}
           </div>
 
@@ -185,29 +94,21 @@ const Province: React.FC<ProvinceProps> = ({
             <h3
               className={`text-2xl ${
                 isProvinceShowC ? "text-yellow-400" : "text-white-600"
-              } active:text-yellow-600 cursor-pointer font-semibold`}
+              } cursor-pointer font-semibold`}
               onClick={() => setIsProvinceShowC((prev) => !prev)}
             >
               21~ {isProvinceShowC ? "▲" : "▼"}
             </h3>
             {isProvinceShowC && (
-              <>
-                {section440.length > 0 ? (
-                  <div className="space-y-4 ml-4">
-                    {renderGroupedHighways(groupByPrefix(section440))}
-                  </div>
-                ) : (
-                  <p className="text-gray-500">
-                    No highways found in this range.
-                  </p>
-                )}
-              </>
+              <div className="space-y-4 ml-4">
+                {section440.length > 0
+                  ? renderGroupedHighways(section440)
+                  : "No highways found"}
+              </div>
             )}
           </div>
         </>
       )}
     </div>
   );
-};
-
-export default Province;
+}

@@ -1,154 +1,45 @@
-"use client";
-import Link from "next/link";
-import Head from "next/head";
-import { TitleContext } from "../context/TitleContext";
-import Loading from "./loading";
-import {
-  use,
-  useState,
-  useEffect,
-  useContext,
-  useRef,
-  MouseEvent,
-} from "react";
-import Province from "./Province";
-import County from "./County";
-import Footer from "../footer/footer";
+// src/app/highways/page.tsx
+import fs from "fs/promises";
+import path from "path";
+import HighwayListClient from "./HighwayListClient";
 
-type Highway = {
-  id: string;
-  name: string;
-  prefix?: string;
-  images?: string[];
-  description?: string;
-  currentImageIndex?: number;
-  [key: string]: any; // 允許其他屬性存在
-};
+export default async function HighwayListServer() {
+  try {
+    // 讀取本地 JSON
+    const imagesPath = path.join(process.cwd(), "public", "db_image.json");
+    const descPath = path.join(process.cwd(), "public", "db_description.json");
 
-type GroupedHighways = {
-  [prefix: string]: Highway[];
-};
+    const [imagesData, descriptionsData] = await Promise.all([
+      fs.readFile(imagesPath, "utf-8"),
+      fs.readFile(descPath, "utf-8"),
+    ]);
 
-const HighwayList = () => {
-  const [highways, setHighways] = useState<Highway[]>([]);
-  const { title, setTitle } = useContext(TitleContext);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [hoveredHighway, setHoveredHighway] = useState<Highway | null>(null);
-  const [groupedHighways, setGroupedHighways] = useState<GroupedHighways>({});
-  const [touchTimeout, setTouchTimeout] = useState<NodeJS.Timeout | null>(null);
+    const images: Record<string, string[]> = JSON.parse(imagesData);
+    const descriptions: Record<string, string> = JSON.parse(descriptionsData);
 
-  useEffect(() => {
-    const fetchHighways = async () => {
-      setLoading(true);
-      await new Promise((r) => setTimeout(r, 3000));
-      try {
-        const response = await fetch("http://localhost:8000/highways");
-        if (!response.ok) throw new Error("Failed to fetch highways data");
-        const data: Highway[] = await response.json();
+    // fetch 公路基本資料
+    const res = await fetch("http://localhost:8000/highways");
+    if (!res.ok) throw new Error("Failed to fetch highways data");
+    const highways = await res.json();
 
-        const [imagesRes, descRes] = await Promise.all([
-          fetch("/db_image.json"),
-          fetch("/db_description.json"),
-        ]);
+    // 合併資料
+    const detailedHighways = highways.map((hwy: any) => ({
+      ...hwy,
+      images: images[hwy.id] || [],
+      description: descriptions[hwy.id] || "",
+      currentImageIndex: 0,
+    }));
 
-        if (!imagesRes.ok || !descRes.ok)
-          throw new Error("Failed to fetch additional data");
-
-        const imagesData: { [key: string]: string[] } = await imagesRes.json();
-        const descriptionsData: { [key: string]: string } =
-          await descRes.json();
-
-        const detailedHighways = await Promise.all(
-          data.map(async (highway) => {
-            const highwayId = highway.id;
-            return {
-              ...highway,
-              images: imagesData[highwayId] || [],
-              description: descriptionsData[highwayId] || "",
-              currentImageIndex: 0,
-            };
-          })
-        );
-
-        const grouped = detailedHighways.reduce(
-          (acc: GroupedHighways, highway) => {
-            const prefix = highway.prefix || "其他";
-            acc[prefix] = acc[prefix] || [];
-            acc[prefix].push(highway);
-            return acc;
-          },
-          {}
-        );
-
-        setHighways(detailedHighways);
-        setGroupedHighways(grouped);
-        setLoading(false);
-      } catch (error: any) {
-        setError(error.message || "發生錯誤");
-        setLoading(false);
-      }
-    };
-
-    fetchHighways();
-  }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent | any) => {
-      if (
-        !event.target.closest(".highway-card") &&
-        !event.target.closest(".highway-link")
-      ) {
-        setHoveredHighway(null);
-      }
-    };
-
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, []);
-
-  return loading ? (
-    <>
-      <Loading />
-      <Footer />
-    </>
-  ) : (
-    <>
-      <Head>
-        <title>{title}</title>
-      </Head>
-      <div className="container mx-auto px-4 py-6">
-        <h1 className="text-4xl font-bold text-white-800 text-center my-8">
-          公路列表
-        </h1>
-
-        <div className="pl-1 md:pl-3 lg:pl-5">
-          <Province
-            hoveredHighway={hoveredHighway}
-            setHoveredHighway={setHoveredHighway}
-            highways={highways}
-            setHighways={setHighways}
-            loading={loading}
-            setLoading={setLoading}
-            error={error}
-            setError={setError}
-          />
-          <County
-            hoveredHighway={hoveredHighway}
-            setHoveredHighway={setHoveredHighway}
-            highways={highways}
-            setHighways={setHighways}
-            loading={loading}
-            setLoading={setLoading}
-            error={error}
-            setError={setError}
-          />
-        </div>
+    return <HighwayListClient highways={detailedHighways} />;
+  } catch (err) {
+    console.error(err);
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-6">
+        <h1 className="text-3xl font-bold mb-4">🚧 發生錯誤</h1>
+        <p className="text-lg mb-6">
+          無法載入公路資料，可能是伺服器或網路有問題。
+        </p>
       </div>
-      <Footer />
-    </>
-  );
-};
-
-export default HighwayList;
+    );
+  }
+}

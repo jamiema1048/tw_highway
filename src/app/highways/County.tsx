@@ -3,33 +3,22 @@ import { useState, useEffect, useRef } from "react";
 import HighwayCard from "./HighwayCard";
 import { Highway } from "types/highway";
 
-interface CountyProps {
+interface Props {
   highways: Highway[];
-  setHighways: React.Dispatch<React.SetStateAction<Highway[]>>;
   hoveredHighway: Highway | null;
-  setHoveredHighway: React.Dispatch<React.SetStateAction<Highway | null>>;
+  setHoveredHighway: (hwy: Highway | null) => void;
   loading: boolean;
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  error: string | null;
-  setError: React.Dispatch<React.SetStateAction<string | null>>;
+  setLoading: (val: boolean) => void;
 }
 
-const County: React.FC<CountyProps> = ({
+export default function County({
   highways,
-  setHighways,
   hoveredHighway,
   setHoveredHighway,
   loading,
   setLoading,
-  error,
-  setError,
-}) => {
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
+}: Props) {
   const [isCountyShow, setIsCountyShow] = useState(false);
-  const [groupedHighways, setGroupedHighways] = useState<
-    Record<string, Highway[]>
-  >({});
   const [isCountyShowCXX, setIsCountyShowCXX] = useState(false);
   const [isCountyShowCXL, setIsCountyShowCXL] = useState(false);
   const [isCountyShowCLX, setIsCountyShowCLX] = useState(false);
@@ -37,80 +26,25 @@ const County: React.FC<CountyProps> = ({
   const [isCountyShowCC, setIsCountyShowCC] = useState(false);
   const [isCountyShowCCXX, setIsCountyShowCCXX] = useState(false);
 
-  useEffect(() => {
-    const fetchHighways = async () => {
-      setLoading(true);
-      await new Promise((r) => setTimeout(r, 3000));
-
-      try {
-        const response = await fetch("http://localhost:8000/highways");
-        if (!response.ok) throw new Error("Failed to fetch highways data");
-        const data: Highway[] = await response.json();
-
-        const [imagesRes, descRes] = await Promise.all([
-          fetch("/db_image.json"),
-          fetch("/db_description.json"),
-        ]);
-
-        if (!imagesRes.ok || !descRes.ok)
-          throw new Error("Failed to fetch additional data");
-
-        const [imagesData, descriptionsData]: [
-          Record<number, string[]>,
-          Record<number, string>
-        ] = await Promise.all([imagesRes.json(), descRes.json()]);
-
-        const detailedHighways: Highway[] = await Promise.all(
-          data.map(async (highway) => {
-            const highwayId = highway.id;
-            return {
-              ...highway,
-              images: imagesData[highwayId] || [],
-              description: descriptionsData[highwayId] || "",
-              currentImageIndex: 0,
-            };
-          })
-        );
-
-        const grouped = detailedHighways.reduce(
-          (acc: Record<string, Highway[]>, highway) => {
-            const prefix = highway.prefix || "其他";
-            acc[prefix] = acc[prefix] || [];
-            acc[prefix].push(highway);
-            return acc;
-          },
-          {}
-        );
-
-        setHighways(detailedHighways);
-        setGroupedHighways(grouped);
-        setLoading(false);
-      } catch (error: any) {
-        setError(error.message);
-        setLoading(false);
-      }
-    };
-
-    fetchHighways();
-  }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (
-        !target.closest(".highway-card") &&
-        !target.closest(".highway-link")
-      ) {
-        setHoveredHighway(null);
-      }
-    };
-
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, []);
-
-  const filterHighways = (min: number, max: number) =>
-    highways.filter((h) => h.id >= min && h.id < max);
+  // 過濾不同段的 highways
+  const section120 = highways.filter(
+    (hwy) => hwy.id / 100 >= 100 && hwy.id / 100 < 121
+  );
+  const section140 = highways.filter(
+    (hwy) => hwy.id / 100 >= 121 && hwy.id / 100 < 141
+  );
+  const section160 = highways.filter(
+    (hwy) => hwy.id / 100 >= 141 && hwy.id / 100 < 161
+  );
+  const section180 = highways.filter(
+    (hwy) => hwy.id / 100 >= 161 && hwy.id / 100 < 181
+  );
+  const section200 = highways.filter(
+    (hwy) => hwy.id / 100 >= 181 && hwy.id / 100 < 201
+  );
+  const section220 = highways.filter(
+    (hwy) => hwy.id / 100 >= 201 && hwy.id / 100 < 221
+  );
 
   const groupByPrefix = (section: Highway[]) => {
     const grouped: Record<number, Highway[]> = {};
@@ -122,24 +56,21 @@ const County: React.FC<CountyProps> = ({
     return grouped;
   };
 
-  const renderGroupedHighways = (grouped: Record<number, Highway[]>) => {
-    return Object.entries(grouped).map(([prefix, highways]) => (
+  const renderGroupedHighways = (section: Highway[]) =>
+    Object.entries(groupByPrefix(section)).map(([prefix, highways]) => (
       <div key={prefix} className="flex flex-wrap gap-4">
-        {highways.map((h) => (
+        {highways.map((hwy) => (
           <HighwayCard
-            key={h.id}
-            highway={h}
+            key={hwy.id}
+            highway={hwy}
             hoveredHighway={hoveredHighway}
             setHoveredHighway={setHoveredHighway}
             loading={loading}
             setLoading={setLoading}
-            error={error}
-            setError={setError}
           />
         ))}
       </div>
     ));
-  };
 
   return (
     <div className="ml-3 md:ml-6 lg:ml-9 mt-4 h-md:mt-6 h-lg:mt-8">
@@ -154,69 +85,111 @@ const County: React.FC<CountyProps> = ({
 
       {isCountyShow && (
         <>
-          {[
-            {
-              label: "101~120",
-              section: filterHighways(10100, 12100),
-              state: isCountyShowCXX,
-              setter: setIsCountyShowCXX,
-            },
-            {
-              label: "121~140",
-              section: filterHighways(12100, 14100),
-              state: isCountyShowCXL,
-              setter: setIsCountyShowCXL,
-            },
-            {
-              label: "141~160",
-              section: filterHighways(14100, 16100),
-              state: isCountyShowCLX,
-              setter: setIsCountyShowCLX,
-            },
-            {
-              label: "161~180",
-              section: filterHighways(16100, 18100),
-              state: isCountyShowCLXXX,
-              setter: setIsCountyShowCLXXX,
-            },
-            {
-              label: "181~200",
-              section: filterHighways(18100, 20100),
-              state: isCountyShowCC,
-              setter: setIsCountyShowCC,
-            },
-            {
-              label: "201~",
-              section: filterHighways(20100, 22000),
-              state: isCountyShowCCXX,
-              setter: setIsCountyShowCCXX,
-            },
-          ].map(({ label, section, state, setter }) => (
-            <div key={label} className="space-y-4 ml-4">
-              <h3
-                className={`text-2xl ${
-                  state ? "text-yellow-400" : "text-white-600"
-                } active:text-yellow-600 cursor-pointer font-semibold`}
-                onClick={() => setter((prev) => !prev)}
-              >
-                {label} {state ? "▲" : "▼"}
-              </h3>
-              {state &&
-                (section.length > 0 ? (
-                  <div className="space-y-4 ml-4">
-                    {renderGroupedHighways(groupByPrefix(section))}
-                  </div>
-                ) : (
-                  <p className="text-gray-500">
-                    No highways found in this range.
-                  </p>
-                ))}
-            </div>
-          ))}
+          <div className="space-y-4 ml-4">
+            <h3
+              className={`text-2xl ${
+                isCountyShowCXX ? "text-yellow-400" : "text-white-600"
+              } cursor-pointer font-semibold`}
+              onClick={() => setIsCountyShowCXX((prev) => !prev)}
+            >
+              101~120 {isCountyShowCXX ? "▲" : "▼"}
+            </h3>
+            {isCountyShowCXX && (
+              <div className="space-y-4 ml-4">
+                {section120.length > 0
+                  ? renderGroupedHighways(section120)
+                  : "No highways found"}
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-4 ml-4">
+            <h3
+              className={`text-2xl ${
+                isCountyShowCXL ? "text-yellow-400" : "text-white-600"
+              } cursor-pointer font-semibold`}
+              onClick={() => setIsCountyShowCXL((prev) => !prev)}
+            >
+              121~140 {isCountyShowCXL ? "▲" : "▼"}
+            </h3>
+            {isCountyShowCXL && (
+              <div className="space-y-4 ml-4">
+                {section140.length > 0
+                  ? renderGroupedHighways(section140)
+                  : "No highways found"}
+              </div>
+            )}
+          </div>
+          <div className="space-y-4 ml-4">
+            <h3
+              className={`text-2xl ${
+                isCountyShowCLX ? "text-yellow-400" : "text-white-600"
+              } cursor-pointer font-semibold`}
+              onClick={() => setIsCountyShowCLX((prev) => !prev)}
+            >
+              141~160 {isCountyShowCLX ? "▲" : "▼"}
+            </h3>
+            {isCountyShowCLX && (
+              <div className="space-y-4 ml-4">
+                {section160.length > 0
+                  ? renderGroupedHighways(section160)
+                  : "No highways found"}
+              </div>
+            )}
+          </div>
+          <div className="space-y-4 ml-4">
+            <h3
+              className={`text-2xl ${
+                isCountyShowCLXXX ? "text-yellow-400" : "text-white-600"
+              } cursor-pointer font-semibold`}
+              onClick={() => setIsCountyShowCLXXX((prev) => !prev)}
+            >
+              161~180 {isCountyShowCLXXX ? "▲" : "▼"}
+            </h3>
+            {isCountyShowCLXXX && (
+              <div className="space-y-4 ml-4">
+                {section180.length > 0
+                  ? renderGroupedHighways(section180)
+                  : "No highways found"}
+              </div>
+            )}
+          </div>
+          <div className="space-y-4 ml-4">
+            <h3
+              className={`text-2xl ${
+                isCountyShowCC ? "text-yellow-400" : "text-white-600"
+              } cursor-pointer font-semibold`}
+              onClick={() => setIsCountyShowCC((prev) => !prev)}
+            >
+              181~200 {isCountyShowCC ? "▲" : "▼"}
+            </h3>
+            {isCountyShowCC && (
+              <div className="space-y-4 ml-4">
+                {section200.length > 0
+                  ? renderGroupedHighways(section200)
+                  : "No highways found"}
+              </div>
+            )}
+          </div>
+          <div className="space-y-4 ml-4">
+            <h3
+              className={`text-2xl ${
+                isCountyShowCCXX ? "text-yellow-400" : "text-white-600"
+              } cursor-pointer font-semibold`}
+              onClick={() => setIsCountyShowCCXX((prev) => !prev)}
+            >
+              201~ {isCountyShowCCXX ? "▲" : "▼"}
+            </h3>
+            {isCountyShowCCXX && (
+              <div className="space-y-4 ml-4">
+                {section220.length > 0
+                  ? renderGroupedHighways(section220)
+                  : "No highways found"}
+              </div>
+            )}
+          </div>
         </>
       )}
     </div>
   );
-};
-
-export default County;
+}
