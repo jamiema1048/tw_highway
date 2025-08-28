@@ -37,7 +37,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ## To-Do
 1. Fix test file fetch problem and API problem    
 2. Design UI
-3. The card will disappear when mouse move from a link to another, Fix it  
+3. The card will run out of screen when it close to edge, fix it 
 4. Design transition animation
 5. theMost can't request title, fix it!!!!!
 ## Require
