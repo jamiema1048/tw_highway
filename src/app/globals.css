@@ -19,3 +19,7 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.highway-card {
+  max-width: calc(100vw - 20px); /* 保證不會超出螢幕 */
+}
