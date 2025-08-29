@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useRef, MouseEvent, TouchEvent, useEffect } from "react";
+import {
+  useRef,
+  useState,
+  useLayoutEffect,
+  MouseEvent,
+  TouchEvent,
+} from "react";
 import Link from "next/link";
 import { Highway } from "types/highway";
 
@@ -16,72 +22,145 @@ export default function HighwayCard({
   setHoveredHighway,
 }: Props) {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [touchTimeout, setTouchTimeout] = useState<NodeJS.Timeout | null>(null);
+  const touchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const cardRef = useRef<HTMLDivElement | null>(null);
-  const [position, setPosition] = useState<"top" | "bottom">("top"); // 👈 新增 state
+
+  // 存 trigger（連結）的 bounding rect（在 mouseenter/touchstart 時抓）
+  const triggerRectRef = useRef<DOMRect | null>(null);
+
   const [visible, setVisible] = useState(false);
-  const positionSetRef = useRef(false);
+  const [positionSet, setPositionSet] = useState(false); // 是否已為本次 hover 決定位置
+  const [stylePos, setStylePos] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
 
-  // 當 hover 變化時，決定字卡位置並控制顯示
-  useEffect(() => {
-    if (hoveredHighway?.id === highway.id && cardRef.current) {
-      const rect = cardRef.current.getBoundingClientRect();
-      console.log(rect.top);
+  // -------------- helpers --------------
+  const clearTimeoutRef = (
+    ref: React.MutableRefObject<NodeJS.Timeout | null>
+  ) => {
+    if (ref.current) {
+      clearTimeout(ref.current);
+      ref.current = null;
+    }
+  };
 
-      // 左右超界處理
-      if (rect.right > window.innerWidth) {
-        cardRef.current.style.left = "auto";
-        cardRef.current.style.right = "0";
-        cardRef.current.style.transform = "none";
-      }
-      if (rect.left < 0) {
-        cardRef.current.style.left = "0";
-        cardRef.current.style.transform = "none";
-      }
+  // 顯示（由 mouseenter 呼叫）
+  const showCard = () => {
+    clearTimeoutRef(timeoutRef);
+    setHoveredHighway(highway);
+    setVisible(false); // 先不顯示，等位置計算完再顯示
+    setPositionSet(false);
+    // triggerRectRef 已由 handleMouseEnter 塞好
+  };
 
-      // 上下超界處理
-      // ✅ 只在 position 尚未設定時決定
-      if (!positionSetRef.current) {
-        if (rect.top < 0) {
-          setPosition("bottom");
-        } else if (rect.bottom > window.innerHeight) {
-          setPosition("top");
-        } else {
-          setPosition("top");
-        }
-        positionSetRef.current = true; // 標記已經決定過
-      }
-
-      // 下一幀才顯示 → 避免先出現錯位
-      requestAnimationFrame(() => setVisible(true));
-    } else {
+  // 延遲隱藏（由 mouseleave 呼叫）
+  const hideCard = () => {
+    clearTimeoutRef(timeoutRef);
+    timeoutRef.current = setTimeout(() => {
+      // 防止舊 timeout 關掉別人的卡（functional set + id check）
+      setHoveredHighway((prev) => (prev?.id === highway.id ? null : prev));
       setVisible(false);
-      positionSetRef.current = false; // hover 結束時重置
-    }
-  }, [hoveredHighway]);
+      triggerRectRef.current = null;
+      setPositionSet(false);
+      setStylePos(null);
+    }, 300);
+  };
 
-  // Touch 手勢觸發 hover
-  const handleTouchStart = () => {
-    if (touchTimeout) clearTimeout(touchTimeout);
-    const timeout = setTimeout(() => {
-      setHoveredHighway(highway);
+  // --------------- measure & position ---------------
+  // 用 useLayoutEffect 確保在 DOM layout 階段處理，並用 requestAnimationFrame 作保險
+  useLayoutEffect(() => {
+    if (
+      hoveredHighway?.id === highway.id &&
+      cardRef.current &&
+      triggerRectRef.current
+    ) {
+      // 計算要放哪裡：以 triggerRect + card 的實際尺寸計算
+      requestAnimationFrame(() => {
+        if (!cardRef.current || !triggerRectRef.current) return;
+
+        const cardH = cardRef.current.offsetHeight;
+        const cardW = cardRef.current.offsetWidth;
+        const linkRect = triggerRectRef.current!;
+        const margin = 8;
+
+        // 優先把卡放在上方（preference），但若超上緣就放下方
+        const topIfAbove = linkRect.top - cardH - margin;
+        const topIfBelow = linkRect.bottom + margin;
+
+        const willBeTop = topIfAbove >= 0; // 如果上方足夠空間則上方
+        const finalTop = willBeTop ? topIfAbove : topIfBelow;
+
+        // 水平置中，並防止左右溢出
+        let left = linkRect.left + linkRect.width / 2 - cardW / 2;
+        const minLeft = 8;
+        const maxLeft = window.innerWidth - cardW - 8;
+        if (left < minLeft) left = minLeft;
+        if (left > maxLeft) left = maxLeft;
+
+        // 設 style（使用 fixed，以 viewport 為基準）
+        setStylePos({ top: Math.round(finalTop), left: Math.round(left) });
+        setPositionSet(true);
+
+        // 再下一幀顯示（避免先顯示再 reposition）
+        requestAnimationFrame(() => setVisible(true));
+      });
+    } else {
+      // hover 結束或資料不齊，隱藏並重置
+      setVisible(false);
+      setPositionSet(false);
+      setStylePos(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hoveredHighway]); // 本 effect 在 hoveredHighway 改變時執行
+
+  // --------------- mouse / touch handlers ---------------
+  const handleMouseEnter = (e: MouseEvent<HTMLAnchorElement>) => {
+    clearTimeoutRef(timeoutRef);
+    // 立刻記錄 trigger 的 rect（基準）
+    triggerRectRef.current = (
+      e.currentTarget as HTMLElement
+    ).getBoundingClientRect();
+    showCard();
+  };
+
+  const handleMouseLeave = () => {
+    hideCard();
+  };
+
+  const handleCardMouseEnter = () => {
+    // 進入卡片則取消 hide timeout（保持顯示）
+    clearTimeoutRef(timeoutRef);
+  };
+  const handleCardMouseLeave = () => {
+    hideCard();
+  };
+
+  const handleTouchStart = (e: TouchEvent<HTMLAnchorElement>) => {
+    clearTimeoutRef(touchTimeoutRef);
+    // touch 也記錄 trigger rect（使用 currentTarget）
+    triggerRectRef.current = (
+      e.currentTarget as HTMLElement
+    ).getBoundingClientRect();
+    touchTimeoutRef.current = setTimeout(() => {
+      showCard();
     }, 500);
-    setTouchTimeout(timeout);
   };
-
   const handleTouchEnd = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-    setHoveredHighway((prev) => (prev?.id === highway.id ? null : prev)); // ✅ 防止 A 關掉 B
+    clearTimeoutRef(touchTimeoutRef);
+    // 立即清掉（或你也可以延遲）
+    setHoveredHighway((prev) => (prev?.id === highway.id ? null : prev));
+    setVisible(false);
+    triggerRectRef.current = null;
+    setPositionSet(false);
+    setStylePos(null);
   };
 
-  // 切換圖片
+  // --------------- image nav (unchanged) ---------------
   const handleNextImage = () => {
     if (
       hoveredHighway?.images &&
-      hoveredHighway.currentImageIndex! < hoveredHighway.images.length - 1
+      (hoveredHighway.currentImageIndex || 0) < hoveredHighway.images.length - 1
     ) {
       setHoveredHighway({
         ...hoveredHighway,
@@ -99,32 +178,7 @@ export default function HighwayCard({
     }
   };
 
-  // Mouse hover
-  // 顯示 tooltip
-  const showCard = (hwy: Highway) => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current); // ✅ 取消舊的 hide
-    setHoveredHighway(hwy);
-  };
-
-  // 延遲隱藏 tooltip
-  const hideCard = () => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current); // ✅ 確保不疊加
-    console.log(highway.id);
-    timeoutRef.current = setTimeout(() => {
-      setHoveredHighway((prev) => (prev?.id === highway.id ? null : prev)); // ✅ 防止 A 關掉 B
-    }, 300);
-  };
-
-  // 連結 hover
-  const handleMouseEnter = () => showCard(highway);
-  const handleMouseLeave = () => hideCard();
-
-  // tooltip hover
-  const handleCardMouseEnter = () => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-  };
-  const handleCardMouseLeave = () => hideCard();
-
+  // --------------- render ---------------
   return (
     <h3 className="relative text-xl">
       <Link
@@ -145,15 +199,18 @@ export default function HighwayCard({
       {hoveredHighway?.id === highway.id && (
         <div
           ref={cardRef}
-          className={`absolute transition-opacity duration-150 ${
-            visible ? "opacity-100" : "opacity-0"
-          } ${
-            position === "top" ? "bottom-full mb-4" : "top-full mt-4"
-          } w-80 p-4 bg-white border border-gray-300 shadow-lg rounded-lg z-50 highway-card`}
+          // 使用 fixed 並用 stylePos 控制位置（確保 position 以 viewport 為基準）
           style={{
-            left: "50%",
-            transform: "translateX(-50%)",
+            position: "fixed",
+            top: stylePos ? `${stylePos.top}px` : "-9999px",
+            left: stylePos ? `${stylePos.left}px` : "-9999px",
+            width: "20rem",
+            zIndex: 9999,
+            transition: "opacity 150ms",
+            opacity: visible ? 1 : 0,
+            pointerEvents: visible ? "auto" : "none",
           }}
+          className="p-4 bg-white border border-gray-300 shadow-lg rounded-lg highway-card"
           onMouseEnter={handleCardMouseEnter}
           onMouseLeave={handleCardMouseLeave}
         >
@@ -172,7 +229,9 @@ export default function HighwayCard({
                 <>
                   <button
                     className={`absolute top-1/2 left-0 transform ${
-                      hoveredHighway.currentImageIndex > 0 ? "block" : "hidden"
+                      (hoveredHighway.currentImageIndex || 0) > 0
+                        ? "block"
+                        : "hidden"
                     } -translate-y-1/2 bg-gray-800 text-white p-2 rounded-full z-10`}
                     onClick={handlePrevImage}
                     disabled={(hoveredHighway.currentImageIndex || 0) <= 0}
@@ -182,7 +241,7 @@ export default function HighwayCard({
 
                   <button
                     className={`absolute top-1/2 right-0 transform ${
-                      hoveredHighway.currentImageIndex <
+                      (hoveredHighway.currentImageIndex || 0) <
                       hoveredHighway.images.length - 1
                         ? "block"
                         : "hidden"

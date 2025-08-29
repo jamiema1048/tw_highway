@@ -13,10 +13,6 @@ export default function Home(): JSX.Element {
     window.location.href = "/highways";
   };
 
-  const handleToTheMostClick = (): void => {
-    window.location.href = "/themost";
-  };
-
   const handleToReferenceClick = (): void => {
     window.location.href = "/reference";
   };
@@ -59,13 +55,6 @@ export default function Home(): JSX.Element {
               className="text-lg m-4 bg-green-500 text-white hover:text-yellow-300 active:text-yellow-600 p-4 rounded hover:bg-green-600 active:bg-green-800 active:shadow-green-400 active:shadow-md flex flex-row"
             >
               <span>公路列表</span>
-            </button>
-
-            <button
-              onClick={handleToTheMostClick}
-              className="text-lg m-4 bg-green-500 text-white hover:text-yellow-300 active:text-yellow-600 p-4 rounded hover:bg-green-600 active:bg-green-800 active:shadow-green-400 active:shadow-md flex flex-row"
-            >
-              <span>公路之最</span>
             </button>
 
             <button
