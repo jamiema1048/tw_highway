@@ -1,109 +1,70 @@
-import React from "react";
-import { render, screen, waitFor, act } from "@testing-library/react";
-import { describe, it, vi, beforeAll, afterEach, afterAll } from "vitest";
-import HighwayList from "../../src/app/highways/page";
-import { TitleProvider } from "../../src/app/context/TitleContext";
-import { rest } from "msw";
-import { setupServer } from "msw/node";
+import { render, screen, waitFor } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import HighwayListServer from "../../src/app/highways/page";
 
-// Mock API Server 設置
-const server = setupServer(
-  rest.get("http://localhost:8000/highways", (req, res, ctx) => {
-    const delayTime = Math.random() * 3000 + 1000; // 模擬延遲
-    return res(
-      ctx.delay(delayTime),
-      ctx.json([
-        { id: 10100, name: "市道101", remark: "" },
-        { id: 18400, name: "縣道184", remark: "已解編" },
-        { id: 40203, name: "台2丙線", remark: "" },
-      ])
-    );
-  })
-);
-
-beforeAll(() => {
-  server.listen({
-    onUnhandledRequest: "warn",
-  });
-});
-afterEach(() => {
-  server.resetHandlers();
-});
-afterAll(() => {
-  server.close();
+// mock fs/promises
+vi.mock("fs/promises", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("fs/promises")>();
+  return {
+    ...actual,
+    readFile: vi.fn(),
+  };
 });
 
-describe("HighwayList Component", () => {
-  it("手動測試 Mock API", async () => {
-    const response = await fetch("http://localhost:8000/highways");
-    const data = await response.json();
-    expect(data).toEqual([
-      { id: 10100, name: "市道101", remark: "" },
-      { id: 18400, name: "縣道184", remark: "已解編" },
-      { id: 40203, name: "台2丙線", remark: "" },
-    ]);
+const mockReadFile = vi.mocked((await import("fs/promises")).readFile);
+
+// mock fetch
+global.fetch = vi.fn();
+
+describe("HighwayListServer 測試", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  it("應該顯示 '公路列表' 作為標題", () => {
-    render(
-      <TitleProvider>
-        <HighwayList />
-      </TitleProvider>
-    );
-    expect(screen.getByText("公路列表")).toBeInTheDocument();
-  });
+  it("應該能正確讀取 JSON 並渲染 HighwayListClient", async () => {
+    // 模擬讀取 images.json 和 descriptions.json
+    mockReadFile
+      .mockResolvedValueOnce(
+        JSON.stringify({
+          "40100": ["/image/001/20201206_111653.jpg"],
+        })
+      ) // 第一次讀 images.json
+      .mockResolvedValueOnce(
+        JSON.stringify({
+          "40100": "台1線",
+        })
+      ); // 第二次讀 descriptions.json
 
-  it("應該在載入時顯示 Loading", () => {
-    render(
-      <TitleProvider>
-        <HighwayList />
-      </TitleProvider>
-    );
-    expect(screen.getByText("Loading data...")).toBeInTheDocument();
-  });
-
-  it("應該成功顯示公路列表", async () => {
-    render(
-      <TitleProvider>
-        <HighwayList />
-      </TitleProvider>
-    );
-
-    await waitFor(
-      () =>
-        expect(screen.queryByText("Loading data...")).not.toBeInTheDocument(),
-      { timeout: 15000 }
-    );
-
-    await act(async () => {
-      const highway101 = await screen.findByText("市道101");
-      const highway184 = await screen.findByText("縣道184 (已解編)");
-      const highway203 = await screen.findByText("台2丙線");
-
-      expect(highway101).toBeInTheDocument();
-      expect(highway184).toBeInTheDocument();
-      expect(highway203).toBeInTheDocument();
+    // 模擬 fetch
+    (global.fetch as vi.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => [
+        { id: "40100", name: "台1線" },
+        { id: "40203", name: "台2丙線" },
+        { id: "12200", name: "縣道122" },
+      ],
     });
-  });
 
-  it("應該處理 API 錯誤並顯示錯誤訊息", async () => {
-    server.use(
-      rest.get("http://localhost:8000/highways", (req, res, ctx) => {
-        return res(ctx.status(500));
-      })
-    );
+    // ✅ 只 render 一次
+    const ui = await HighwayListServer();
+    render(ui);
 
-    render(
-      <TitleProvider>
-        <HighwayList />
-      </TitleProvider>
-    );
+    expect(
+      await screen.findByRole("heading", { level: 1 })
+    ).toBeInTheDocument();
 
-    // 根據你的 HighwayList 組件，錯誤訊息會以文字形式呈現，這裡以範例 "Failed to fetch highways data" 作判斷
     await waitFor(() => {
-      expect(
-        screen.getByText(/Failed to fetch highways data/i)
-      ).toBeInTheDocument();
+      expect(screen.getByTestId("province")).toBeInTheDocument();
+      expect(screen.getByTestId("county")).toBeInTheDocument();
     });
+  });
+
+  it("遇到錯誤時應顯示錯誤畫面", async () => {
+    mockReadFile.mockRejectedValueOnce(new Error("讀取失敗"));
+
+    const ui = await HighwayListServer();
+    render(ui);
+
+    expect(await screen.findByText("🚧 發生錯誤")).toBeInTheDocument();
   });
 });

@@ -73,7 +73,11 @@ export default function County({
     ));
 
   return (
-    <div className="ml-3 md:ml-6 lg:ml-9 mt-4 h-md:mt-6 h-lg:mt-8">
+    <div
+      className="ml-3 md:ml-6 lg:ml-9 mt-4 h-md:mt-6 h-lg:mt-8"
+      id="county"
+      data-testid="county"
+    >
       <h2
         className={`text-4xl font-semibold ${
           isCountyShow ? "text-yellow-400" : "text-white-600"

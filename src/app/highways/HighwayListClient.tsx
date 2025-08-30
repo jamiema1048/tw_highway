@@ -40,7 +40,10 @@ export default function HighwayListClient({ highways }: Props) {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <h1 className="text-4xl font-bold text-white text-center my-8">
+      <h1
+        role="heading"
+        className="text-4xl font-bold text-white text-center my-8"
+      >
         公路列表
       </h1>
       <div className="pl-1 md:pl-3 lg:pl-5">

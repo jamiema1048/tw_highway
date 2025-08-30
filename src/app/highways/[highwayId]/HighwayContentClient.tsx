@@ -38,7 +38,10 @@ export default function HighwayContentClient({ highway }: Props) {
   return (
     <>
       <div className="container mx-auto px-4 py-6">
-        <h1 className="text-5xl font-semibold text-white-800 text-center">
+        <h1
+          role="heading"
+          className="text-5xl font-semibold text-white-800 text-center"
+        >
           {highway.name}
         </h1>
 

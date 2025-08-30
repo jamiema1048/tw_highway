@@ -58,9 +58,14 @@ export default function Province({
         ))}
       </div>
     ));
+  console.log("Province rendered!");
 
   return (
-    <div className="ml-3 md:ml-6 lg:ml-9 mt-4">
+    <div
+      className="ml-3 md:ml-6 lg:ml-9 mt-4"
+      id="province"
+      data-testid="province"
+    >
       <h2
         className={`text-4xl font-semibold ${
           isProvinceShow ? "text-yellow-400" : "text-white-600"
