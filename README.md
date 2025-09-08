@@ -49,4 +49,6 @@ npm install msw
 npm install @vitejs/plugin-react  
 npm install vite-plugin-magical-svg  
 npm install --save-dev @testing-library/user-event  
-npm install --save-dev typescript @types/react @types/node tailwindcss-language-server ts-node typescript @types/node
+npm install --save-dev typescript @types/react @types/node tailwindcss-language-server ts-node typescript @types/node  
+npm install --save-dev @testing-library/user-event
+
