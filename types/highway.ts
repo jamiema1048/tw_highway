@@ -7,4 +7,5 @@ export interface Highway {
   images?: string[];
   currentImageIndex?: number;
   theMostCorres?: string;
+  descriptions?: string[];
 }

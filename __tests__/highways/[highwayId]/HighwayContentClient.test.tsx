@@ -10,18 +10,11 @@ describe("HighwayContentClient 測試", () => {
       start: "台北市中正區(行政院)",
       end: "屏東縣枋山鄉楓港",
       length: 461.081,
+      images: ["/img1.jpg"], // ✅ 陣列
+      descriptions: ["描述文字"], // ✅ 陣列
     };
 
-    const mockImages = ["/img1.jpg"];
-    const mockDescriptions = ["描述文字"];
-
-    render(
-      <HighwayContentClient
-        highway={mockHighway}
-        images={mockImages}
-        descriptions={mockDescriptions}
-      />
-    );
+    render(<HighwayContentClient highway={mockHighway} />);
 
     // 驗證 highway 名稱
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(

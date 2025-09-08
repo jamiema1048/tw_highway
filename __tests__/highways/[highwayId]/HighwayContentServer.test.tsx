@@ -23,7 +23,7 @@ describe("HighwayContentServer 測試", () => {
     vi.clearAllMocks();
   });
 
-  it("應該能正確渲染 HighwayContentClient", async () => {
+  it("應該能正確渲染 HighwayContentClient (台1線)", async () => {
     // mock fs
     mockReadFile
       .mockResolvedValueOnce(JSON.stringify({ "40100": ["/img1.jpg"] })) // images
@@ -38,7 +38,7 @@ describe("HighwayContentServer 測試", () => {
           name: "台1線",
           start: "台北市中正區(行政院)",
           end: "屏東縣枋山鄉楓港",
-          length: 461.081,
+          length: "461.081",
         },
       ],
     });
@@ -52,7 +52,13 @@ describe("HighwayContentServer 測試", () => {
 
       // 檢查起點/終點
       expect(screen.getByText(/起點:/)).toBeInTheDocument();
+      expect(screen.getByText("台北市中正區(行政院)")).toBeInTheDocument();
       expect(screen.getByText(/終點:/)).toBeInTheDocument();
+      expect(screen.getByText("屏東縣枋山鄉楓港")).toBeInTheDocument();
+
+      // 檢查長度
+      expect(screen.getByText(/長度:/)).toBeInTheDocument();
+      expect(screen.getByText(/461\.081/)).toBeInTheDocument();
 
       // 檢查描述文字
       expect(screen.getByText("描述文字")).toBeInTheDocument();
@@ -80,7 +86,7 @@ describe("HighwayContentServer 測試", () => {
           name: "台1線",
           start: "台北市中正區(行政院)",
           end: "屏東縣枋山鄉楓港",
-          length: 461.081,
+          length: "461.081",
         },
       ],
     });

@@ -1,17 +1,20 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import HighwayListServer from "../../src/app/highways/page";
 
-// mock fs/promises
+// ✅ 正確 mock fs/promises default import
 vi.mock("fs/promises", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("fs/promises")>();
+  const actual = await importOriginal();
   return {
-    ...actual,
-    readFile: vi.fn(),
+    __esModule: true,
+    default: {
+      ...actual,
+      readFile: vi.fn(),
+    },
   };
 });
 
-const mockReadFile = vi.mocked((await import("fs/promises")).readFile);
+const mockReadFile = vi.mocked((await import("fs/promises")).default.readFile);
 
 // mock fetch
 global.fetch = vi.fn();
@@ -49,13 +52,19 @@ describe("HighwayListServer 測試", () => {
     const ui = await HighwayListServer();
     render(ui);
 
-    expect(
-      await screen.findByRole("heading", { level: 1 })
-    ).toBeInTheDocument();
-
     await waitFor(() => {
-      expect(screen.getByTestId("province")).toBeInTheDocument();
-      expect(screen.getByTestId("county")).toBeInTheDocument();
+      waitFor(() => {
+        // 先展開 省道
+        fireEvent.click(screen.getByText("省道 ▼"));
+        fireEvent.click(screen.getByText("1~20 ▼"));
+        // 再展開 縣市道
+        fireEvent.click(screen.getByText("縣市道 ▼"));
+        fireEvent.click(screen.getByText("121~140 ▼"));
+      });
+      // 驗證內容
+      expect(screen.getByText("台1線")).toBeInTheDocument();
+      expect(screen.getByText("台2丙線")).toBeInTheDocument();
+      expect(screen.getByText("縣道122")).toBeInTheDocument();
     });
   });
 
