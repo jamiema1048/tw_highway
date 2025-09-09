@@ -1,5 +1,6 @@
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import userEvent from "@testing-library/user-event";
 import HighwayListServer from "../../src/app/highways/page";
 
 // ✅ 正確 mock fs/promises default import
@@ -52,15 +53,15 @@ describe("HighwayListServer 測試", () => {
     const ui = await HighwayListServer();
     render(ui);
 
-    await waitFor(() => {
-      waitFor(() => {
-        // 先展開 省道
-        fireEvent.click(screen.getByText("省道 ▼"));
-        fireEvent.click(screen.getByText("1~20 ▼"));
-        // 再展開 縣市道
-        fireEvent.click(screen.getByText("縣市道 ▼"));
-        fireEvent.click(screen.getByText("121~140 ▼"));
-      });
+    await waitFor(async () => {
+      // 先展開 省道
+      await userEvent.click(screen.getByText("省道 ▼"));
+      await userEvent.click(screen.getByText("1~20 ▼"));
+
+      // 再展開 縣市道
+      await userEvent.click(screen.getByText("縣市道 ▼"));
+      await userEvent.click(screen.getByText("121~140 ▼"));
+
       // 驗證內容
       expect(screen.getByText("台1線")).toBeInTheDocument();
       expect(screen.getByText("台2丙線")).toBeInTheDocument();
