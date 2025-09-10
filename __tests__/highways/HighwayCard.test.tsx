@@ -1,4 +1,5 @@
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { vi } from "vitest";
 import userEvent from "@testing-library/user-event";
 import HighwayCard from "../../src/app/highways/HighwayCard";
 import { Highway } from "types/highway";
@@ -57,19 +58,41 @@ describe("HighwayCard", () => {
     });
   });
 
-  it("長按 link (touchstart) 也會顯示卡片", async () => {
-    vi.useFakeTimers();
+  it("長按 link (touchstart) 顯示卡片，放開不消失", async () => {
     render(<Wrapper highway={baseHighway} />);
     const link = screen.getByRole("link", { name: "台1線" });
 
     fireEvent.touchStart(link);
-    vi.advanceTimersByTime(600);
+
+    // 等待 600ms 讓長按觸發
+    await new Promise((r) => setTimeout(r, 600));
 
     await waitFor(() => {
       expect(screen.getByText("台北－楓港")).toBeInTheDocument();
     });
 
     fireEvent.touchEnd(link);
+
+    // 放開後仍存在
+    expect(screen.getByText("台北－楓港")).toBeInTheDocument();
+  });
+
+  it("短按 link (<500ms) 應該跳轉", async () => {
+    // 模擬 location.href
+    const originalLocation = window.location;
+    delete (window as any).location;
+    (window as any).location = { href: "" };
+
+    vi.useFakeTimers();
+    render(<Wrapper highway={baseHighway} />);
+    const link = screen.getByRole("link", { name: "台1線" });
+
+    fireEvent.touchStart(link);
+    vi.advanceTimersByTime(200); // 短按
+    fireEvent.touchEnd(link);
+
+    expect(window.location.href).toBe("highways/40100");
+    (window as any).location = originalLocation;
     vi.useRealTimers();
   });
 });

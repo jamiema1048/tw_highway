@@ -3,6 +3,7 @@
 import {
   useRef,
   useState,
+  useEffect,
   useLayoutEffect,
   MouseEvent,
   TouchEvent,
@@ -136,25 +137,60 @@ export default function HighwayCard({
     hideCard();
   };
 
+  const clearTouchTimeout = () => {
+    if (touchTimeoutRef.current) {
+      clearTimeout(touchTimeoutRef.current);
+      touchTimeoutRef.current = null;
+    }
+  };
+
+  let touchStartTime = 0;
+
   const handleTouchStart = (e: TouchEvent<HTMLAnchorElement>) => {
-    clearTimeoutRef(touchTimeoutRef);
-    // touch 也記錄 trigger rect（使用 currentTarget）
+    e.preventDefault(); // 阻止瀏覽器進入 active → click
+    touchStartTime = Date.now();
     triggerRectRef.current = (
       e.currentTarget as HTMLElement
     ).getBoundingClientRect();
+
     touchTimeoutRef.current = setTimeout(() => {
       showCard();
     }, 500);
   };
-  const handleTouchEnd = () => {
+
+  const handleTouchEnd = (e: TouchEvent<HTMLAnchorElement>) => {
     clearTimeoutRef(touchTimeoutRef);
-    // 立即清掉（或你也可以延遲）
-    setHoveredHighway((prev) => (prev?.id === highway.id ? null : prev));
-    setVisible(false);
-    triggerRectRef.current = null;
-    setPositionSet(false);
-    setStylePos(null);
+    const pressDuration = Date.now() - touchStartTime;
+
+    if (pressDuration < 500) {
+      // 短按 → 照常跳轉
+      window.location.href = `highways/${highway.id}`;
+    }
   };
+
+  useEffect(() => {
+    if (!visible) return;
+
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      if (cardRef.current && !cardRef.current.contains(e.target as Node)) {
+        hideCard();
+      }
+    };
+
+    const handleBack = () => {
+      hideCard();
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    window.addEventListener("popstate", handleBack);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+      window.removeEventListener("popstate", handleBack);
+    };
+  }, [visible]);
 
   // --------------- image nav (unchanged) ---------------
   const handleNextImage = () => {
