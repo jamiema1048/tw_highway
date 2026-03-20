@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { describe, it, vi, beforeEach } from "vitest";
-import HighwayContentServer from "../../../src/app/highways/[highwayId]/page";
+import HighwayContentServer from "../../../src/app/(pages)/highways/[highwayId]/page";
 
 // ✅ 正確 mock fs/promises default import
 vi.mock("fs/promises", async (importOriginal) => {

@@ -4,7 +4,7 @@ import Link from "next/link";
 import Head from "next/head";
 import { useState, useContext, useEffect } from "react";
 import { TitleContext } from "../context/TitleContext";
-import Footer from "../footer/footer";
+import Footer from "../../(components)/footer/footer";
 
 const DataReference = (): JSX.Element => {
   const { title, setTitle } = useContext(TitleContext);

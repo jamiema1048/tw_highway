@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect, useContext, useRef } from "react";
-import { TitleContext } from "../context/TitleContext";
-import Province from "./Province";
-import County from "./County";
-import Footer from "../footer/footer";
-import Loading from "./loading";
+import { TitleContext } from "@/app/(context)/title/TitleContext";
+import Province from "@/app/(components)/highways/Province";
+import County from "@/app/(components)/highways/County";
+import Footer from "@/app/(components)/footer/footer";
+import Loading from "@/app/(pages)/highways/loading";
 import { Highway } from "types/highway";
 
 interface Props {

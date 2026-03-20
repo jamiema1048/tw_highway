@@ -1,7 +1,7 @@
 // src/app/highways/HighwayContentServer.tsx
 import path from "path";
 import fs from "fs/promises";
-import HighwayContentClient from "./HighwayContentClient";
+import HighwayContentClient from "@/app/(client)/highways/HighwayContentClient";
 import { Highway } from "types/highway";
 
 interface Props {

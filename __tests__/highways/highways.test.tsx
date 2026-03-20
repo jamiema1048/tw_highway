@@ -1,7 +1,7 @@
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import userEvent from "@testing-library/user-event";
-import HighwayListServer from "../../src/app/highways/page";
+import HighwayListServer from "../../src/app/(pages)/highways/page";
 
 // ✅ 正確 mock fs/promises default import
 vi.mock("fs/promises", async (importOriginal) => {
@@ -31,12 +31,12 @@ describe("HighwayListServer 測試", () => {
       .mockResolvedValueOnce(
         JSON.stringify({
           "40100": ["/image/001/20201206_111653.jpg"],
-        })
+        }),
       ) // 第一次讀 images.json
       .mockResolvedValueOnce(
         JSON.stringify({
           "40100": "台1線",
-        })
+        }),
       ); // 第二次讀 descriptions.json
 
     // 模擬 fetch

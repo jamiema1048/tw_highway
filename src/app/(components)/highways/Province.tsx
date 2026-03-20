@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import HighwayCard from "./HighwayCard";
+import HighwayCard from "@/app/(components)/cards/HighwayCard";
 import { Highway } from "types/highway";
 
 interface Props {
@@ -26,10 +26,10 @@ export default function Province({
 
   // 過濾不同段的 highways
   const section420 = highways.filter(
-    (hwy) => hwy.id / 100 >= 400 && hwy.id / 100 < 421
+    (hwy) => hwy.id / 100 >= 400 && hwy.id / 100 < 421,
   );
   const section440 = highways.filter(
-    (hwy) => hwy.id / 100 >= 421 && hwy.id / 100 < 500
+    (hwy) => hwy.id / 100 >= 421 && hwy.id / 100 < 500,
   );
 
   // 分組函數

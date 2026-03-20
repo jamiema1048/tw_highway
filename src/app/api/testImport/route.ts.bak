@@ -1,0 +1,24 @@
+import { NextResponse } from "next/server";
+import { connectToDatabase } from "@/app/_lib/mongodb";
+import mongoose from "mongoose";
+import Highway from "@/models/Highway";
+
+export async function GET() {
+  try {
+    await connectToDatabase();
+    const count = await Highway.countDocuments(); // 算出總共有幾筆資料
+    return NextResponse.json({
+      dbName: mongoose.connection.name, // 確認目前連的是哪個資料庫
+      totalDocuments: count,
+    });
+  } catch (error: any) {
+    console.error("失敗:", error);
+    return NextResponse.json(
+      {
+        error: "遷移過程中發生錯誤",
+        details: error.message,
+      },
+      { status: 500 },
+    );
+  }
+}

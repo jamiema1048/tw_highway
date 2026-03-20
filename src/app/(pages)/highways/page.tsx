@@ -1,7 +1,7 @@
 // src/app/highways/page.tsx
 import fs from "fs/promises";
 import path from "path";
-import HighwayListClient from "./HighwayListClient";
+import HighwayListClient from "@/app/(client)/highways/HighwayListClient";
 
 export default async function HighwayListServer() {
   try {

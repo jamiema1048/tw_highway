@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import HighwayCard from "./HighwayCard";
+import HighwayCard from "@/app/(components)/cards/HighwayCard";
 import { Highway } from "types/highway";
 
 interface Props {
@@ -28,22 +28,22 @@ export default function County({
 
   // 過濾不同段的 highways
   const section120 = highways.filter(
-    (hwy) => hwy.id / 100 >= 100 && hwy.id / 100 < 121
+    (hwy) => hwy.id / 100 >= 100 && hwy.id / 100 < 121,
   );
   const section140 = highways.filter(
-    (hwy) => hwy.id / 100 >= 121 && hwy.id / 100 < 141
+    (hwy) => hwy.id / 100 >= 121 && hwy.id / 100 < 141,
   );
   const section160 = highways.filter(
-    (hwy) => hwy.id / 100 >= 141 && hwy.id / 100 < 161
+    (hwy) => hwy.id / 100 >= 141 && hwy.id / 100 < 161,
   );
   const section180 = highways.filter(
-    (hwy) => hwy.id / 100 >= 161 && hwy.id / 100 < 181
+    (hwy) => hwy.id / 100 >= 161 && hwy.id / 100 < 181,
   );
   const section200 = highways.filter(
-    (hwy) => hwy.id / 100 >= 181 && hwy.id / 100 < 201
+    (hwy) => hwy.id / 100 >= 181 && hwy.id / 100 < 201,
   );
   const section220 = highways.filter(
-    (hwy) => hwy.id / 100 >= 201 && hwy.id / 100 < 221
+    (hwy) => hwy.id / 100 >= 201 && hwy.id / 100 < 221,
   );
 
   const groupByPrefix = (section: Highway[]) => {

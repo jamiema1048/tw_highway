@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { TitleProvider } from "./context/TitleContext";
+import { TitleProvider } from "./(context)/title/TitleContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

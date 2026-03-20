@@ -3,8 +3,8 @@
 import React, { useContext } from "react";
 import Image from "next/image";
 import Head from "next/head";
-import { TitleContext } from "./context/TitleContext";
-import Footer from "./footer/footer";
+import { TitleContext } from "./(context)/title/TitleContext";
+import Footer from "./(components)/footer/footer";
 
 export default function Home(): JSX.Element {
   const { title } = useContext(TitleContext);

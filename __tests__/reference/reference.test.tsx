@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import DataReference from "@/app/reference/page";
+import DataReference from "@/app/(pages)/reference/page";
 import { TitleContext } from "@/app/context/TitleContext";
 
 // 定義 Context 的型別（可改為從你實際的定義檔案中 import）
@@ -17,7 +17,7 @@ describe("DataReference Component", () => {
     render(
       <TitleContext.Provider value={{ title, setTitle } as TitleContextType}>
         <DataReference />
-      </TitleContext.Provider>
+      </TitleContext.Provider>,
     );
 
     const reference = await screen.findAllByText("參考資料");
