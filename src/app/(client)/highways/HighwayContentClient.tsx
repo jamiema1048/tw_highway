@@ -4,27 +4,10 @@ import { useContext, useEffect } from "react";
 import { TitleContext } from "@/app/(context)/title/TitleContext";
 import Image from "next/image";
 import Footer from "@/app/(components)/footer/footer";
-
-interface HighwayData {
-  id: number;
-  name: string;
-  routeName?: string;
-  start: string;
-  currentStart?: string;
-  end: string;
-  currentEnd?: string;
-  length: number;
-  currentLength?: number;
-  highest?: number;
-  highestPlace?: string;
-  otherName?: string;
-  remark?: string;
-  images?: string[];
-  descriptions?: string[];
-}
+import { Highway } from "types/highway";
 
 interface Props {
-  highway: HighwayData;
+  highway: Highway;
 }
 
 export default function HighwayContentClient({ highway }: Props) {
@@ -88,7 +71,7 @@ export default function HighwayContentClient({ highway }: Props) {
           )}
           {highway.otherName && (
             <h3 className="text-xl mb-4">
-              <strong>別稱:</strong> {highway.otherName}
+              <strong>別稱:</strong> {highway.otherName.join("、")}
             </h3>
           )}
           {highway.remark && (
@@ -102,13 +85,13 @@ export default function HighwayContentClient({ highway }: Props) {
           <h2 className="text-2xl font-semibold mb-4">
             Images and Descriptions
           </h2>
-          {highway.images && highway.descriptions && (
+          {highway.images && (
             <div className="columns-1 sm:columns-2 md:columns-3 gap-4 m-2">
               {highway.images.map((img, idx) => (
-                <div key={idx} className="media-item inline-block p-4">
+                <div key={img._id} className="media-item inline-block p-4">
                   <div className="image-container overflow-hidden rounded-lg">
                     <Image
-                      src={img}
+                      src={img.url}
                       alt={`${highway.name} - ${idx}`}
                       width={800}
                       height={600}
@@ -116,25 +99,16 @@ export default function HighwayContentClient({ highway }: Props) {
                       className="w-full object-cover rounded-lg"
                     />
                   </div>
-                  {highway.descriptions[idx] && (
+                  {img.description && (
+                    <p className="mt-2 text-sm sm:text-lg">{img.description}</p>
+                  )}
+                  {img.capturedAt && (
                     <p className="mt-2 text-sm sm:text-lg">
-                      {highway.descriptions[idx]}
+                      {new Date(img.capturedAt).toISOString().split("T")[0]}
                     </p>
                   )}
                 </div>
               ))}
-
-              {highway.descriptions.length > highway.images.length &&
-                highway.descriptions
-                  .slice(highway.images.length)
-                  .map((desc, idx) => (
-                    <p
-                      key={`desc-${idx}`}
-                      className="mt-2 sm:mt-4 text-sm sm:text-lg"
-                    >
-                      {desc}
-                    </p>
-                  ))}
             </div>
           )}
         </section>

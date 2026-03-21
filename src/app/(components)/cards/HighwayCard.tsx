@@ -10,9 +10,10 @@ import {
 } from "react";
 import Link from "next/link";
 import { Highway } from "types/highway";
+import Image from "next/image";
 
 interface Props {
-  highway: Highway;
+  highway: Highway[];
   hoveredHighway: Highway | null;
   setHoveredHighway: (hwy: Highway | null) => void;
 }
@@ -38,7 +39,7 @@ export default function HighwayCard({
 
   // -------------- helpers --------------
   const clearTimeoutRef = (
-    ref: React.MutableRefObject<NodeJS.Timeout | null>
+    ref: React.MutableRefObject<NodeJS.Timeout | null>,
   ) => {
     if (ref.current) {
       clearTimeout(ref.current);
@@ -228,8 +229,8 @@ export default function HighwayCard({
         {highway.remark?.includes("解編")
           ? `${highway.name} (已解編)`
           : highway.remark?.includes("未納編")
-          ? `${highway.name} (未納編)`
-          : highway.name}
+            ? `${highway.name} (未納編)`
+            : highway.name}
       </Link>
 
       {hoveredHighway?.id === highway.id && (
@@ -253,12 +254,15 @@ export default function HighwayCard({
           {/* 圖片展示 */}
           {hoveredHighway.images?.length ? (
             <div className="relative">
-              <img
+              <Image
+                width={600}
+                height={600}
                 src={
                   hoveredHighway.images[hoveredHighway.currentImageIndex || 0]
+                    .url
                 }
                 alt={hoveredHighway.name}
-                className="w-full h-48 object-cover rounded-md"
+                className="w-full h-48 object-contain rounded-md"
               />
 
               {hoveredHighway.images.length > 1 && (

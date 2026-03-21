@@ -1,35 +1,33 @@
-// src/app/highways/page.tsx
-import fs from "fs/promises";
-import path from "path";
+import { connectToDatabase } from "@/app/_lib/mongodb";
+import Highway from "@/models/Highway";
 import HighwayListClient from "@/app/(client)/highways/HighwayListClient";
 
 export default async function HighwayListServer() {
   try {
-    // 讀取本地 JSON
-    const imagesPath = path.join(process.cwd(), "public", "db_image.json");
-    const descPath = path.join(process.cwd(), "public", "db_description.json");
+    // 1. 連線到 MongoDB
+    await connectToDatabase();
 
-    const [imagesData, descriptionsData] = await Promise.all([
-      fs.readFile(imagesPath, "utf-8"),
-      fs.readFile(descPath, "utf-8"),
-    ]);
+    // 2. 直接從資料庫抓取所有公路資料
+    // .lean() 可以讓回傳的資料變成純 JS 物件，效能更好且方便傳給 Client Component
+    const highwaysData = await Highway.find({}).sort({ id: 1 }).lean();
 
-    const images: Record<string, string[]> = JSON.parse(imagesData);
-    const descriptions: Record<string, string> = JSON.parse(descriptionsData);
-
-    // fetch 公路基本資料
-    const res = await fetch("http://localhost:8000/highways");
-    if (!res.ok) throw new Error("Failed to fetch highways data");
-    const highways = await res.json();
-
-    // 合併資料
-    const detailedHighways = highways.map((hwy: any) => ({
+    // 3. 格式化資料（處理 MongoDB 的 _id 與 Date 物件轉為純字串/數字）
+    const detailedHighways = highwaysData.map((hwy: any) => ({
       ...hwy,
-      images: images[hwy.id] || [],
-      description: descriptions[hwy.id] || "",
-      currentImageIndex: 0,
+      _id: hwy._id.toString(), // 把 ObjectId 轉成字串
+      // 確保 images 裡的日期也能被 Client Component 讀取
+      images: hwy.images.map((img: any) => ({
+        ...img,
+        _id: img._id?.toString(),
+        capturedAt: img.capturedAt
+          ? new Date(img.capturedAt).toISOString()
+          : null,
+      })),
+      currentImageIndex: 0, // 為了你的 Client 端切換功能保留
     }));
+    console.log(highwaysData);
 
+    // 4. 直接把完整的資料丟給 Client Component
     return <HighwayListClient highways={detailedHighways} />;
   } catch (err) {
     console.error(err);

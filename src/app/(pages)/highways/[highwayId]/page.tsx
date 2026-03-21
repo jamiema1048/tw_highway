@@ -1,6 +1,6 @@
 // src/app/highways/HighwayContentServer.tsx
-import path from "path";
-import fs from "fs/promises";
+import { connectToDatabase } from "@/app/_lib/mongodb";
+import HighwayModel from "@/models/Highway";
 import HighwayContentClient from "@/app/(client)/highways/HighwayContentClient";
 import { Highway } from "types/highway";
 
@@ -10,35 +10,45 @@ interface Props {
 
 export default async function HighwayContentServer({ params }: Props) {
   try {
-    const highwayId = params.highwayId;
+    const resolvedParams = await params;
+    const highwayId = resolvedParams.highwayId;
 
-    // 取得所有 highways
-    const res = await fetch("http://localhost:8000/highways");
-    if (!res.ok) throw new Error("Failed to fetch highways data");
-    const allHighways: Highway[] = await res.json();
+    // 1. 連線資料庫
+    await connectToDatabase();
 
-    const highway = allHighways.find((h) => Number(h.id) === Number(highwayId));
+    // 2. 精準查詢：只抓取這一個 ID 的資料
+    // .lean() 會回傳純 JS 物件，效能更好
+    const highwayData = await HighwayModel.findOne({
+      id: Number(highwayId),
+    }).lean();
 
-    if (!highway) return <div>Highway not found</div>;
+    if (!highwayData) {
+      return (
+        <div className="p-10 text-center">找不到公路編號：{highwayId}</div>
+      );
+    }
+    // 3. 序列化處理 (Serialization)
+    // Next.js 不允許直接傳遞 MongoDB 的 ObjectId 或 Date 物件給 Client Component
+    const serializedHighway = {
+      ...highwayData,
+      _id: highwayData._id.toString(),
+      images: highwayData.images.map((img: any) => ({
+        ...img,
+        _id: img._id?.toString(),
+        capturedAt: img.capturedAt
+          ? new Date(img.capturedAt).toISOString()
+          : null,
+      })),
+    };
 
-    // 讀取本地 JSON（fs）
-    const imagesPath = path.join(process.cwd(), "public/db_image.json");
-    const descPath = path.join(process.cwd(), "public/db_description.json");
-
-    const [imagesData, descriptionsData] = await Promise.all([
-      fs.readFile(imagesPath, "utf-8"),
-      fs.readFile(descPath, "utf-8"),
-    ]);
-
-    const imagesJson: Record<string, string[]> = JSON.parse(imagesData);
-    const descJson: Record<string, string[]> = JSON.parse(descriptionsData);
-
-    highway.images = imagesJson[highwayId] || [];
-    highway.descriptions = descJson[highwayId] || [];
-
-    return <HighwayContentClient highway={highway} />;
+    // 4. 將單一公路資料傳給 Client 渲染
+    return <HighwayContentClient highway={serializedHighway} />;
   } catch (err) {
-    console.error(err);
-    return <div className="text-red-500">無法載入資料</div>;
+    console.error("載入公路頁面失敗:", err);
+    return (
+      <div className="text-red-500 p-10">
+        無法載入公路資料，請檢查資料庫連線。
+      </div>
+    );
   }
 }
