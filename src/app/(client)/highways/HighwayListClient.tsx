@@ -6,7 +6,7 @@ import Province from "@/app/(components)/highways/Province";
 import County from "@/app/(components)/highways/County";
 import Footer from "@/app/(components)/footer/footer";
 import Loading from "@/app/(pages)/highways/loading";
-import { Highway } from "types/highway";
+import { Highway } from "@/types/highway";
 
 interface Props {
   highways: Highway[];

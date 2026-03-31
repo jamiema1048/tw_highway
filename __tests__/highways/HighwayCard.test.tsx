@@ -2,7 +2,7 @@ import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { vi } from "vitest";
 import userEvent from "@testing-library/user-event";
 import HighwayCard from "../../src/app/(components)/cards/HighwayCard";
-import { Highway } from "types/highway";
+import { Highway } from "@/types/highway";
 import { useState } from "react";
 
 function Wrapper({ highway }: { highway: Highway }) {

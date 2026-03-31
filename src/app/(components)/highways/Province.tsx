@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import HighwayCard from "@/app/(components)/cards/HighwayCard";
-import { Highway } from "types/highway";
+import { Highway } from "@/types/highway";
 
 interface Props {
   highways: Highway[];

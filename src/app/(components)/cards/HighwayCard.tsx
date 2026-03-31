@@ -9,7 +9,7 @@ import {
   TouchEvent,
 } from "react";
 import Link from "next/link";
-import { Highway } from "types/highway";
+import { Highway } from "@/types/highway";
 import Image from "next/image";
 
 interface Props {

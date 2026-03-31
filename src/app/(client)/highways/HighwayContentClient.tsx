@@ -4,7 +4,7 @@ import { useContext, useEffect } from "react";
 import { TitleContext } from "@/app/(context)/title/TitleContext";
 import Image from "next/image";
 import Footer from "@/app/(components)/footer/footer";
-import { Highway } from "types/highway";
+import { Highway } from "@/types/highway";
 
 interface Props {
   highway: Highway;
