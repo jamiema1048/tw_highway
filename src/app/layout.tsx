@@ -1,7 +1,8 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { TitleProvider } from "./(context)/title/TitleContext";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,13 +23,16 @@ type RootLayoutProps = {
   children: ReactNode;
 };
 
-export default function RootLayout({ children }: RootLayoutProps): JSX.Element {
+export default function RootLayout({
+  children,
+}: RootLayoutProps): React.ReactElement {
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <TitleProvider>{children}</TitleProvider>
+        <GoogleAnalytics gaId="G-Z06FDY743K" />
       </body>
     </html>
   );

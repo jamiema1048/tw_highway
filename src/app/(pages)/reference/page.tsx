@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import Head from "next/head";
-import { useState, useContext, useEffect } from "react";
-import { TitleContext } from "../context/TitleContext";
+import React, { useState, useContext, useEffect } from "react";
+import { TitleContext } from "@/app/(context)/title/TitleContext";
 import Footer from "../../(components)/footer/footer";
 
-const DataReference = (): JSX.Element => {
+const DataReference = (): React.ReactElement => {
   const { title, setTitle } = useContext(TitleContext);
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState<boolean>(true);

@@ -6,7 +6,7 @@ import Head from "next/head";
 import { TitleContext } from "./(context)/title/TitleContext";
 import Footer from "./(components)/footer/footer";
 
-export default function Home(): JSX.Element {
+export default function Home(): React.ReactElement {
   const { title } = useContext(TitleContext);
 
   const handleToListClick = (): void => {

@@ -1,6 +1,7 @@
 "use client";
+import React from "react";
 import Head from "next/head";
-const Loading = (): JSX.Element => {
+const Loading = (): React.ReactElement => {
   //document.title = "載入中請稍後";
   return (
     <>

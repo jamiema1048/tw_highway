@@ -220,17 +220,13 @@ export default function HighwayCard({
     <h3 className="relative text-xl">
       <Link
         href={`highways/${highway.id}`}
-        className="font-bold text-white-600 hover:text-yellow-400 active:text-yellow-600 highway-link"
+        className={`font-bold hover:text-yellow-400 active:text-yellow-600 highway-link ${highway.status === "disused" ? "text-gray-500 line-through" : highway.status === "unlisted" ? "text-blue-400 italic" : "text-white-600"}`}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        {highway.remark?.includes("解編")
-          ? `${highway.name} (已解編)`
-          : highway.remark?.includes("未納編")
-            ? `${highway.name} (未納編)`
-            : highway.name}
+        {highway.name}
       </Link>
 
       {hoveredHighway?.id === highway.id && (

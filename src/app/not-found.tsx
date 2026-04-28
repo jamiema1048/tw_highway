@@ -1,6 +1,7 @@
+import React from "react";
 import Link from "next/link";
 
-const NotFound = (): JSX.Element => {
+const NotFound = (): React.ReactElement => {
   return (
     <>
       <div>
