@@ -46,10 +46,10 @@ const Footer: React.FC = () => {
         )}
       </div>
       <div className="flex flex-col">
-        <h2 className="text-xl font-bold text-white text-center my-8">
+        <h2 className="text-xl font-bold text-black dark:text-white text-center my-8">
           Edit by Aaron Ma
         </h2>
-        <h3 className="text-lg font-bold text-white text-center my-8">
+        <h3 className="text-lg font-bold text-black dark:text-white text-center my-8">
           01.22.2025
         </h3>
       </div>

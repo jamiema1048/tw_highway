@@ -42,7 +42,7 @@ export default function HighwayListClient({ highways }: Props) {
     <div className="container mx-auto px-4 py-6">
       <h1
         role="heading"
-        className="text-4xl font-bold text-white text-center my-8"
+        className="text-4xl font-bold text-black dark:text-white text-center my-8"
       >
         公路列表
       </h1>
